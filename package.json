@@ -3,7 +3,9 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "cypress:open": "cypress open",
+    "test": "start-server-and-test dev http://localhost:3000 cypress:open"
   },
   "dependencies": {
     "axios": "^0.21.1",
@@ -14,7 +16,9 @@
   },
   "devDependencies": {
     "autoprefixer": "^10.2.6",
+    "cypress": "^7.7.0",
     "postcss": "^8.3.5",
+    "start-server-and-test": "^1.12.6",
     "tailwindcss": "^2.2.4"
   }
 }
