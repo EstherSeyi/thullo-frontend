@@ -56,7 +56,7 @@ module.exports = {
     },
     extend: {
       height: {
-        main: "calc(100vh - 8px - 3rem - 6rem)",
+        main: "calc(100vh - 4rem)",
       },
       fontSize: {
         "0.625rem": "0.625rem",
@@ -69,6 +69,8 @@ module.exports = {
       },
       flex: {
         48: "0 0 48%",
+        30: "0 0 30%",
+        70: "0 0 70%",
       },
     },
   },
