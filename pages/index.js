@@ -1,7 +1,7 @@
-import Image from "next/image";
+import Link from "next/link";
 
-import Layout from "../components/layout";
 import AddBoard from "../components/add-board";
+import MemberAvatar from "../components/member-avatar";
 
 import profilepic from "../public/profilepic.jpeg";
 
@@ -11,63 +11,64 @@ export default function Home() {
   const { open } = useModal();
 
   return (
-    <Layout>
-      <section className="w-11/12 max-w-[1024px] mx-auto mt-8 ">
-        <h1 className="text-lg">All Boards</h1>
-        <button
-          className="px-5 py-1.5 bg-blueish-250 rounded text-xs text-misc-white ml-auto block"
-          onClick={() => open(<AddBoard />)}
-        >
-          Add
-        </button>
-        <div className="grid gap-8 mt-16 grid-cols-200">
-          <Card />
-          <Card />
-          <Card />
-          <Card />
-        </div>
-      </section>
-    </Layout>
+    <section className="w-11/12 max-w-[1024px] mx-auto mt-8 ">
+      <h1 className="text-lg">All Boards</h1>
+      <button
+        className="px-5 py-1.5 bg-blueish-250 rounded text-xs text-misc-white ml-auto block"
+        onClick={() => open(<AddBoard />)}
+      >
+        Add
+      </button>
+      <div className="flex flex-wrap mt-16">
+        <Card
+          id="1"
+          title="Devchallenges Board"
+          members={[
+            {
+              id: "233",
+              image: profilepic,
+            },
+            {
+              id: "243",
+              image: profilepic,
+            },
+            {
+              id: "223",
+              image: profilepic,
+            },
+            {
+              id: "263",
+              image: profilepic,
+            },
+            {
+              id: "263",
+              image: profilepic,
+            },
+          ]}
+        />
+      </div>
+    </section>
   );
 }
 
-const Card = () => {
+const Card = ({ title, members }) => {
   return (
-    <div className="bg-misc-white p-3 rounded-md shadow-lg">
+    <div className="bg-misc-white p-3 rounded-md shadow-lg mr-8 mb-8 w-full max-w-[200px]">
       <div className="bg-cardpics px-20 py-16 rounded-md"></div>
-      <p className="mt-2.5 mb-4">Devchallenges Board</p>
+      <Link href={`/boards/${title}`} className="block mt-2.5 mb-4">
+        {title}
+      </Link>
       <div className="flex">
         <div className="flex">
-          <div className="mr-2">
-            <Image
-              className="rounded"
-              src={profilepic}
-              alt="avatar"
-              width={25}
-              height={25}
-            />
-          </div>
-          <div className="mr-2">
-            <Image
-              className="rounded"
-              src={profilepic}
-              alt="avatar"
-              width={25}
-              height={25}
-            />
-          </div>
-          <div className="mr-2">
-            <Image
-              className="rounded"
-              src={profilepic}
-              alt="avatar"
-              width={25}
-              height={25}
-            />
-          </div>
+          {members?.length &&
+            members
+              ?.slice(0, 3)
+              ?.map((member) => (
+                <MemberAvatar imgSrc={member.image} key={member.id} />
+              ))}
         </div>
         <span className="font-noto text-greyish-150 text-xs self-center">
-          + 5 others
+          {members?.length > 3 ? `+ ${members?.length - 3} others` : ""}
         </span>
       </div>
     </div>
