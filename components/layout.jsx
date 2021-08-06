@@ -4,22 +4,39 @@ import { useRouter } from "next/router";
 
 import Search from "./icons/search";
 import ChevronDown from "./icons/chevron-down";
+import ViewGrid from "./icons/view-grid";
 
 import logo from "../public/Logo.svg";
 import profilepic from "../public/profilepic.jpeg";
 
-export default function Layout({ children }) {
+export default function Layout({ children, cardName }) {
   const router = useRouter();
   return (
     <>
       <Head>
-        <title>Thullo</title>
+        <title>{cardName ? `${cardName} - ` : ""}Thullo</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
       <header className="py-4 shadow-sm">
         <div className="flex justify-between w-11/12 sm:w-98% mx-auto">
-          <Image src={logo} alt="logo" />
+          <div className="flex ">
+            <Image src={logo} alt="logo" />
+
+            <div
+              className={cardName ? `hidden md:flex ml-8 items-end` : "hidden"}
+            >
+              <p className="mr-4">{cardName}</p> |{" "}
+              <button
+                className="ml-4 text-greyish-100 bg-greyish-50 px-3 py-1 rounded-lg font-noto font-light flex text-xs"
+                onClick={() => router.push("/")}
+              >
+                <ViewGrid />
+                <p className="self-center">All Boards</p>
+              </button>
+            </div>
+          </div>
+
           <div className="flex">
             <button
               className=" sm:hidden p-1 rounded-md bg-blueish-100 mr-4"
@@ -48,21 +65,13 @@ export default function Layout({ children }) {
           </div>
         </div>
       </header>
-      <main className="w-full h-main overflow-y-scroll bg-blueish-50">
+      <main
+        className={`w-full h-main overflow-y-scroll ${
+          !cardName ? "bg-blueish-50" : ""
+        }`}
+      >
         {children}
       </main>
-
-      <footer className="flex items-center justify-center w-full h-24 border-t">
-        <a
-          className="flex items-center justify-center"
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{" "}
-          <img src="/vercel.svg" alt="Vercel Logo" className="h-4 ml-2" />
-        </a>
-      </footer>
     </>
   );
 }
