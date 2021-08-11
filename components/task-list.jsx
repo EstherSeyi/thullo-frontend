@@ -1,3 +1,4 @@
+import { useRef, useState } from "react";
 import Image from "next/image";
 
 import DotsHorizontal from "./icons/dots-horizontal";
@@ -6,21 +7,98 @@ import PaperClip from "./icons/paper-clip";
 import Chat from "./icons/chat";
 import Tag from "./tag";
 import AddAnother from "./add-another";
+import Cancel from "./icons/cancel";
+import NewCard from "./new-card";
+
+import useClickOutside from "../hooks/use-click-outside";
+import { useModal } from "../context/modal";
 
 const TaskList = ({ list }) => {
+  const { open } = useModal();
+  const [hideEditList, setHideEditList] = useState(true);
+  const [rename, setRename] = useState(false);
+
+  // const [renameRef, setRenameRef] = useRef(null);
+
+  // useClickOutside(renameRef, () => setRename(false));
+
+  const handleRename = (e) => {
+    e.preventDefault();
+    console.log("handling rename");
+  };
+
   return (
     <div className="mr-8 w-[272px]">
-      <div className="flex justify-between mb-4">
-        <p>{list.name}</p>
-        <DotsHorizontal className="text-greyish-100 h-6 w-6" />
-      </div>
+      {rename ? (
+        <form className="flex justify-between mb-4" onSubmit={handleRename}>
+          <input className="bg-transparent focus:outline-none border-b border-greyish-150 text-sm flex-grow mr-4" />
+          <div className="flex items-center">
+            <button
+              className="text-0.625rem text-misc-white bg-greenish-150 px-2 py-1 rounded-lg"
+              type="submit"
+            >
+              save
+            </button>
+            <button
+              className="p-1.5 py-1 border border-greyish-150 ml-2 rounded-lg"
+              type="button"
+              onClick={() => setRename(false)}
+            >
+              <Cancel className="h-3 w-3 text-greyish-150 " />
+            </button>
+          </div>
+        </form>
+      ) : (
+        <div className="flex justify-between mb-4">
+          <div className="relative">
+            <p
+              className="cursor-pointer"
+              onClick={() => setHideEditList(!hideEditList)}
+            >
+              {list.name}
+            </p>
+            <EditListName
+              hide={hideEditList}
+              setHideEditList={setHideEditList}
+              setRename={setRename}
+            />
+          </div>
+          <DotsHorizontal
+            className="text-greyish-100 h-6 w-6 cursor-pointer"
+            onClick={() => setHideEditList(!hideEditList)}
+          />
+        </div>
+      )}
 
       {list?.cards?.length
         ? list?.cards?.map((card) => <TaskCard key={card.title} card={card} />)
         : null}
 
-      <AddAnother text="Add another card" />
+      <AddAnother text="Add another card" onClick={() => open(<NewCard />)} />
     </div>
+  );
+};
+
+const EditListName = ({ hide, setHideEditList, setRename }) => {
+  const editListRef = useRef(null);
+
+  useClickOutside(editListRef, () => setHideEditList(true));
+
+  return (
+    <ul
+      ref={editListRef}
+      className={`${
+        hide ? "hidden" : ""
+      } absolute text-0.625rem text-greyish-100 bg-misc-white left-0 w-36 border border-greyish-250 p-2 rounded-2xl`}
+    >
+      <li
+        className="py-2 border-b border-greyish-250 cursor-pointer"
+        onClick={() => setRename(true)}
+      >
+        Rename
+      </li>
+      <li className="py-2 cursor-pointer">Delete this list</li>
+    </ul>
   );
 };
 
