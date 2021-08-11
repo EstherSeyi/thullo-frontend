@@ -13,6 +13,7 @@ module.exports = {
       cardpics: "url('../public/cardpics.jpeg')",
     },
     colors: {
+      transparent: "transparent",
       blueish: {
         50: "#F8F9FD",
         100: "#D5E6FB",
@@ -30,7 +31,7 @@ module.exports = {
         100: "#828282",
         150: "#BDBDBD",
         200: "#4F4F4F",
-        200: "#E0E0E0",
+        250: "#E0E0E0",
       },
       yellowish: {
         50: "#FCF4DB",
@@ -47,6 +48,7 @@ module.exports = {
       misc: {
         red: "#EB5757",
         black: "#333333",
+        black2: "#000000",
         white: "#ffffff",
       },
     },
