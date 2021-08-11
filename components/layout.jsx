@@ -67,7 +67,7 @@ export default function Layout({ children, cardName }) {
       </header>
       <main
         className={`w-full h-main overflow-y-scroll ${
-          !cardName ? "bg-blueish-50" : ""
+          !cardName ? "bg-blueish-50" : "relative"
         }`}
       >
         {children}
