@@ -28,7 +28,7 @@ const Modal = () => {
         modalState?.isModalOpen ? "block" : "hidden"
       }`}
     >
-      <div ref={modalRef} className="w-11/12 lg:w-2/3 mx-auto">
+      <div ref={modalRef} className="w-11/12 mx-auto lg:w-max">
         {modalState?.modalComponent}
       </div>
     </div>
