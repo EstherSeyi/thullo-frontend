@@ -18,9 +18,9 @@ const TaskList = ({ list }) => {
   const [hideEditList, setHideEditList] = useState(true);
   const [rename, setRename] = useState(false);
 
-  // const [renameRef, setRenameRef] = useRef(null);
+  const renameRef = useRef(null);
 
-  // useClickOutside(renameRef, () => setRename(false));
+  useClickOutside(renameRef, () => rename && setRename(false));
 
   const handleRename = (e) => {
     e.preventDefault();
@@ -30,7 +30,11 @@ const TaskList = ({ list }) => {
   return (
     <div className="mr-8 w-[272px]">
       {rename ? (
-        <form className="flex justify-between mb-4" onSubmit={handleRename}>
+        <form
+          ref={renameRef}
+          className="flex justify-between mb-4"
+          onSubmit={handleRename}
+        >
           <input className="bg-transparent focus:outline-none border-b border-greyish-150 text-sm flex-grow mr-4" />
           <div className="flex items-center">
             <button
@@ -82,7 +86,9 @@ const TaskList = ({ list }) => {
 const EditListName = ({ hide, setHideEditList, setRename }) => {
   const editListRef = useRef(null);
 
-  useClickOutside(editListRef, () => setHideEditList(true));
+  useClickOutside(editListRef, () => {
+    return !hide && setHideEditList(true);
+  });
 
   return (
     <ul
