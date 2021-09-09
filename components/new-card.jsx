@@ -1,7 +1,10 @@
 import Image from "next/image";
+import { useRef, useState } from "react";
 
 import cardpic from "../public/cardpics.jpeg";
 import profilepic from "../public/profilepic.jpeg";
+import { useModal } from "../context/modal";
+import useClickOutside from "../hooks/use-click-outside";
 
 import DocText from "./icons/doc-text";
 import Pencil from "./icons/pencil";
@@ -10,10 +13,31 @@ import UserInCircle, { Users } from "./icons/user";
 import Photograph from "./icons/photograph";
 import MemberAvatar from "./member-avatar";
 import Tag from "./icons/tag";
+import Cancel from "./icons/cancel";
+import Search from "./icons/search";
+import PhotoSearch from "./photo-search";
 
 const NewCard = () => {
+  const { close } = useModal();
+  const membersRef = useRef(null);
+  const coverRef = useRef(null);
+  const [openMembers, setOpenMembers] = useState(false);
+  const [openCover, setOpenCover] = useState(false);
+
+  useClickOutside(membersRef, () => openMembers && setOpenMembers(false));
+  useClickOutside(coverRef, () => {
+    return openCover && setOpenCover(false);
+  });
+
   return (
-    <section className="bg-misc-white mt-10 max-w-2xl mx-auto rounded-lg p-4">
+    <section className="bg-misc-white mt-10 max-w-2xl mx-auto rounded-lg p-4 relative">
+      <button
+        type="button"
+        className="bg-blueish-250 p-1 rounded absolute right-2 top-2 z-[2]"
+        onClick={() => close()}
+      >
+        <Cancel className="h-5 w-5 text-misc-white" />
+      </button>
       <Image
         src={cardpic}
         className="rounded-lg mb-4"
@@ -105,10 +129,23 @@ const NewCard = () => {
             <p className="text-0.625rem">Actions</p>
           </div>
 
-          <div className="text-xs text-greyish-100 font-light flex sm:flex-col">
-            <SideButton Component={Photograph} text="cover" />
+          <div className="relative text-xs text-greyish-100 font-light flex sm:flex-col">
+            <PhotoSearch openCover={openCover} coverRef={coverRef} />
+            <AddMember openMembers={openMembers} membersRef={membersRef} />
+            <SideButton
+              Component={Photograph}
+              text="cover"
+              onClick={() => setOpenCover(true)}
+              style={openCover ? { pointerEvents: "none" } : null}
+            />
             <SideButton Component={Tag} text="labels" />
-            <SideButton Component={Users} text="members" />
+
+            <SideButton
+              Component={Users}
+              text="members"
+              onClick={() => setOpenMembers(true)}
+              style={openMembers ? { pointerEvents: "none" } : null}
+            />
           </div>
         </div>
       </div>
@@ -162,12 +199,77 @@ const Comment = ({ comment }) => {
   );
 };
 
-const SideButton = ({ Component, text }) => {
+const SideButton = ({
+  Component,
+  text,
+  children = null,
+  onClick,
+  style = {},
+}) => {
   return (
-    <button className="flex items-center capitalize bg-greyish-50 mb-2 py-1  px-2 rounded-lg mr-1.5 sm:mr-0">
+    <div
+      role="button"
+      className="flex items-center capitalize bg-greyish-50 mb-2 py-1  px-2 rounded-lg mr-1.5 sm:mr-0 relative cursor-pointer"
+      onClick={onClick}
+      style={style}
+    >
       <Component className="mr-1 h-3 w-3" />
       <span>{text}</span>
-    </button>
+
+      {children}
+    </div>
+  );
+};
+
+const AddMember = ({ openMembers, membersRef }) => {
+  return (
+    <div ref={membersRef}>
+      <div
+        className={` ${
+          !openMembers
+            ? "hidden"
+            : "absolute bg-misc-white top-[-300px] sm:top-9 sm:-left-24 z-[2] border border-greyish-250 p-2 w-60 rounded-xl shadow-sm flex flex-col"
+        }`}
+      >
+        <p className="text-greyish-200 font-bold mb-1">Members </p>
+        <p className="font-noto text-greyish-100 text-xs mb-4">
+          Assign members to this card
+        </p>
+        <form className="flex shadow rounded-lg mb-4">
+          <input
+            placeholder="user..."
+            className="w-full py-1 rounded-lg focus:outline-none pl-2"
+          />
+          <button className="bg-blueish-250 px-2 rounded-lg">
+            <Search className="text-misc-white h-4 w-4" />
+          </button>
+        </form>
+        <div className="border border-greyish-250 rounded-lg p-3 mb-6 max-h-40 overflow-y-scroll">
+          <div className="flex py-2 items-center">
+            <p className="bg-greyish-150 p-1.5 rounded-lg text-misc-white mr-4">
+              MC
+            </p>
+            <p>Morris Croft</p>
+          </div>
+          <div className="flex py-2 items-center">
+            <p className="bg-greyish-150 p-1.5 rounded-lg text-misc-white mr-4">
+              KH
+            </p>
+            <p>Kunal Hough</p>
+          </div>
+          <div className="flex py-2 items-center">
+            <p className="bg-greyish-150 p-1.5 rounded-lg text-misc-white mr-4">
+              KS
+            </p>
+            <p>Kierran Salinas</p>
+          </div>
+        </div>
+
+        <button className="bg-blueish-250 text-misc-white text-0.625rem py-2 px-6 rounded-lg self-center mb-2.5">
+          Invite
+        </button>
+      </div>
+    </div>
   );
 };
 
