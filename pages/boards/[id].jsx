@@ -13,10 +13,12 @@ import Globe from "../../components/icons/globe";
 import DotsHorizontal from "../../components/icons/dots-horizontal";
 import Plus from "../../components/icons/plus";
 import Search from "../../components/icons/search";
+import Cancel from "../../components/icons/cancel";
 
 const Board = () => {
   const [hideVisibility, setHideVisibility] = useState(true);
   const [hideBoard, setHideBoard] = useState(true);
+  const [hideListSetting, setHideListSetting] = useState(true);
   return (
     <section className="w-11/12 mx-auto h-full">
       <div className="flex justify-between mt-8 mb-4 flex-wrap items-center">
@@ -97,11 +99,48 @@ const Board = () => {
               ],
             }}
           />
-
-          <AddAnother text="Add another list" classes="min-w-[250px] h-8" />
+          <div className="relative">
+            <AddAnother
+              text="Add another list"
+              classes="min-w-[250px] h-8"
+              onClick={() => setHideListSetting(false)}
+            />
+            <NewListForm
+              hideListSetting={hideListSetting}
+              setHideListSetting={setHideListSetting}
+            />
+          </div>
         </div>
       </div>
     </section>
+  );
+};
+
+const NewListForm = ({ setHideListSetting, hideListSetting }) => {
+  return (
+    <form
+      className={`${
+        hideListSetting
+          ? "hidden"
+          : "bg-greyish-50 p-2 rounded absolute top-0 left-0 right-0"
+      } `}
+    >
+      <input
+        placeholder="Enter list title..."
+        className="placeholder-greyish-150 font-noto p-1 w-full bg-transparent border-2 border-blueish-250 rounded text-sm"
+      />
+      <div className="flex items-center mt-1">
+        <button
+          className="mr-2 text-misc-white bg-blueish-250 text-xs px-2 py-1 rounded"
+          type="submit"
+        >
+          Add List
+        </button>
+        <button type="button" onClick={() => setHideListSetting(true)}>
+          <Cancel className="h-5 w-5 text-greyish-200" />
+        </button>
+      </div>
+    </form>
   );
 };
 
