@@ -5,7 +5,7 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import axios from "axios";
 import queryString from "query-string";
 
-import Search from "./icons/search";
+import Search from "../icons/search";
 
 export const useUnspalshInfinite = (
   queryKey,

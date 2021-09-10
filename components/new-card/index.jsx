@@ -1,32 +1,38 @@
 import Image from "next/image";
 import { useRef, useState } from "react";
 
-import cardpic from "../public/cardpics.jpeg";
-import profilepic from "../public/profilepic.jpeg";
-import { useModal } from "../context/modal";
-import useClickOutside from "../hooks/use-click-outside";
+import cardpic from "../../public/cardpics.jpeg";
+import profilepic from "../../public/profilepic.jpeg";
+import { useModal } from "../../context/modal";
+import useClickOutside from "../../hooks/use-click-outside";
 
-import DocText from "./icons/doc-text";
-import Pencil from "./icons/pencil";
-import Plus from "./icons/plus";
-import UserInCircle, { Users } from "./icons/user";
-import Photograph from "./icons/photograph";
-import MemberAvatar from "./member-avatar";
-import Tag from "./icons/tag";
-import Cancel from "./icons/cancel";
-import Search from "./icons/search";
+import DocText from "../icons/doc-text";
+import Pencil from "../icons/pencil";
+import Plus from "../icons/plus";
+import UserInCircle, { Users } from "../icons/user";
+import Photograph from "../icons/photograph";
+import MemberAvatar from "../member-avatar";
+import Tag from "../icons/tag";
+import Cancel from "../icons/cancel";
+import Search from "../icons/search";
 import PhotoSearch from "./photo-search";
+import AddLabel from "./add-label";
 
 const NewCard = () => {
   const { close } = useModal();
   const membersRef = useRef(null);
   const coverRef = useRef(null);
+  const labelRef = useRef(null);
   const [openMembers, setOpenMembers] = useState(false);
   const [openCover, setOpenCover] = useState(false);
+  const [openLabel, setOpenLabel] = useState(false);
 
   useClickOutside(membersRef, () => openMembers && setOpenMembers(false));
   useClickOutside(coverRef, () => {
     return openCover && setOpenCover(false);
+  });
+  useClickOutside(labelRef, () => {
+    return openLabel && setOpenLabel(false);
   });
 
   return (
@@ -132,13 +138,19 @@ const NewCard = () => {
           <div className="relative text-xs text-greyish-100 font-light flex sm:flex-col">
             <PhotoSearch openCover={openCover} coverRef={coverRef} />
             <AddMember openMembers={openMembers} membersRef={membersRef} />
+            <AddLabel openLabel={openLabel} labelRef={labelRef} />
             <SideButton
               Component={Photograph}
               text="cover"
               onClick={() => setOpenCover(true)}
               style={openCover ? { pointerEvents: "none" } : null}
             />
-            <SideButton Component={Tag} text="labels" />
+            <SideButton
+              Component={Tag}
+              text="labels"
+              onClick={() => setOpenLabel(true)}
+              style={openLabel ? { pointerEvents: "none" } : null}
+            />
 
             <SideButton
               Component={Users}
