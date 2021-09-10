@@ -6,8 +6,8 @@ import useClickOutside from "../../hooks/use-click-outside";
 
 import MemberAvatar from "../../components/member-avatar";
 import { LockClosed } from "../../components/icons/lock";
-import TaskList from "../../components/task-list";
-import BoardMenu from "../../components/board-menu";
+import TaskList from "../../components/list-actions";
+import BoardMenu from "../../components/board-actions/board-menu";
 import AddAnother from "../../components/add-another";
 import Globe from "../../components/icons/globe";
 import DotsHorizontal from "../../components/icons/dots-horizontal";

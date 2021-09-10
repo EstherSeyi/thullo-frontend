@@ -1,15 +1,17 @@
 import { useState, useRef } from "react";
 import styled from "styled-components";
 
-import Cancel from "./icons/cancel";
-import { UserInCircle } from "./icons/user";
-import MemberAvatar from "./member-avatar";
-import DocText from "./icons/doc-text";
-import Pencil from "./icons/pencil";
-import MenuDescriptionEditor from "./menu-description-editor";
+import Cancel from "../icons/cancel";
+import { UserInCircle } from "../icons/user";
+import DocText from "../icons/doc-text";
+import Pencil from "../icons/pencil";
 
-import profilepic from "../public/profilepic.jpeg";
-import useClickOutside from "../hooks/use-click-outside";
+import MemberAvatar from "../member-avatar";
+import MenuDescriptionEditor from "./menu-description-editor";
+import MemberRow from "./member-row";
+
+import profilepic from "../../public/profilepic.jpeg";
+import useClickOutside from "../../hooks/use-click-outside";
 
 const MenuDescStyles = styled.div.attrs({
   className: "text-justify text-sm text-misc-black2 w-11/12 mb-6 font-light",
@@ -124,24 +126,6 @@ const BoardMenu = ({ hide, setHideBoard }) => {
           <MemberRow name="Waqar Bloom" admin={false} imageSrc={profilepic} />
         </div>
       </div>
-    </div>
-  );
-};
-
-const MemberRow = ({ name, admin = false, imageSrc }) => {
-  return (
-    <div className="flex items-center justify-between font-poppins mb-4">
-      <div className="flex items-center">
-        <MemberAvatar imgSrc={imageSrc} />
-        <p className="ml-4 text-misc-black font-bold">{name}</p>
-      </div>
-      {admin ? (
-        <p className="text-greyish-150 text-0.625rem">Admin</p>
-      ) : (
-        <button className="text-misc-red py-1 px-2 border border-misc-red rounded-md text-0.625rem">
-          Remove
-        </button>
-      )}
     </div>
   );
 };

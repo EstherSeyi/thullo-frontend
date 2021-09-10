@@ -1,20 +1,20 @@
-import Cancel from "./icons/cancel";
-import { LockClosed } from "./icons/lock";
-import Photograph from "./icons/photograph";
+import Cancel from "../icons/cancel";
+import { LockClosed } from "../icons/lock";
+import Photograph from "../icons/photograph";
 
-import { useModal } from "../context/modal";
+import { useModal } from "../../context/modal";
 
 const AddBoard = () => {
   const { close } = useModal();
 
   return (
-    <form className="shadow max-w-[307px] bg-misc-white p-4 rounded-md text-0.625rem mt-[10%] mx-auto relative">
+    <form className="shadow max-w-[307px] sm:w-full lg:w-[307px] bg-misc-white p-4 rounded-md text-0.625rem mt-[10%] mx-auto relative">
       <button
         type="button"
         className="bg-blueish-250 p-1 rounded absolute right-2 top-2"
         onClick={() => close()}
       >
-        <Cancel />
+        <Cancel className="h-4 w-4 text-misc-white" />
       </button>
       <div className="bg-cardpics py-8 rounded-md"></div>
       <input

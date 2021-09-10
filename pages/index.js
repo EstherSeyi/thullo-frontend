@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import AddBoard from "../components/add-board";
+import AddBoard from "../components/board-actions/add-board";
 import MemberAvatar from "../components/member-avatar";
 
 import profilepic from "../public/profilepic.jpeg";
