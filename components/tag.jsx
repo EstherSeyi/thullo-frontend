@@ -1,6 +1,12 @@
-const Tag = ({ name }) => {
+const Tag = ({ name, colorCode = "#2F80ED", bgColorCode = "#DAE4FD" }) => {
   return (
-    <span className="text-0.625rem rounded-full p-1 px-1.5 bg-blueish-150 text-blueish-250">
+    <span
+      style={{
+        color: colorCode,
+        background: bgColorCode,
+      }}
+      className="text-0.625rem rounded-full p-0.5 px-2"
+    >
       {name}
     </span>
   );
