@@ -7,6 +7,7 @@ import "../styles/globals.css";
 import { ModalProvider } from "../context/modal";
 import Modal from "../components/modal";
 import Layout from "../components/layout";
+import AuthLayout from "../components/auth-layout";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -18,14 +19,21 @@ const queryClient = new QueryClient({
 });
 
 function MyApp({ Component, pageProps }) {
-  const { query } = useRouter();
+  const { query, pathname, ...rest } = useRouter();
+
   return (
     <QueryClientProvider client={queryClient}>
       <ModalProvider>
         <Modal />
-        <Layout cardName={query.id}>
-          <Component {...pageProps} />
-        </Layout>
+        {pathname?.includes("login") || pathname?.includes("register") ? (
+          <AuthLayout>
+            <Component {...pageProps} />
+          </AuthLayout>
+        ) : (
+          <Layout cardName={query.id}>
+            <Component {...pageProps} />
+          </Layout>
+        )}
       </ModalProvider>
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
