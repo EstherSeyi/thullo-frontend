@@ -19,7 +19,7 @@ const queryClient = new QueryClient({
 });
 
 function MyApp({ Component, pageProps }) {
-  const { query, pathname, ...rest } = useRouter();
+  const { query, pathname } = useRouter();
 
   return (
     <QueryClientProvider client={queryClient}>
