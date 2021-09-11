@@ -60,6 +60,9 @@ module.exports = {
       height: {
         main: "calc(100vh - 4rem)",
       },
+      minHeight: {
+        main: "calc(100vh - 4rem)",
+      },
       fontSize: {
         "0.625rem": "0.625rem",
       },
@@ -70,7 +73,9 @@ module.exports = {
         200: "repeat(auto-fit, minmax(200px, 1fr));",
       },
       flex: {
+        45: "0 0 45%",
         48: "0 0 48%",
+        50: "0 0 50%",
         30: "0 0 30%",
         70: "0 0 70%",
       },
