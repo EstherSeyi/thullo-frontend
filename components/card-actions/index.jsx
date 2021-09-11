@@ -17,6 +17,7 @@ import Cancel from "../icons/cancel";
 import Search from "../icons/search";
 import PhotoSearch from "./photo-search";
 import AddLabel from "./add-label";
+import EditDescription from "./edit-description";
 
 const NewCard = () => {
   const { close } = useModal();
@@ -26,6 +27,7 @@ const NewCard = () => {
   const [openMembers, setOpenMembers] = useState(false);
   const [openCover, setOpenCover] = useState(false);
   const [openLabel, setOpenLabel] = useState(false);
+  const [editDescription, setEditDescription] = useState(false);
 
   useClickOutside(membersRef, () => openMembers && setOpenMembers(false));
   useClickOutside(coverRef, () => {
@@ -60,29 +62,39 @@ const NewCard = () => {
           <div className="flex text-0.625rem text-greyish-150 items-center font-poppins mb-2">
             <DocText className="h-3 w-3 mr-1" />
             <p className="mr-3">Description</p>
-            <button className="flex text-greyish-100 border border-greyish-150 py-0.5 px-2 rounded-md">
-              <Pencil className="h-3 w-3 mr-2 self-center text-greyish-100" />
-              <span>Edit</span>
-            </button>
+            {editDescription ? null : (
+              <button
+                className="flex text-greyish-100 border border-greyish-150 py-0.5 px-2 rounded-md"
+                onClick={() => setEditDescription(true)}
+              >
+                <Pencil className="h-3 w-3 mr-2 self-center text-greyish-100" />
+                <span>Edit</span>
+              </button>
+            )}
           </div>
-          <div className="font-light text-sm text-[#000000] mb-4">
-            <p>
-              Ideas are created and share here through a card. Here you can
-              describe what you'd like to accomplish. For example you can follow
-              three simple questions to create the card related to your idea:
-            </p>
-            <ul>
-              <li>* Why ? (Why do you wish to do it ?)</li>
-              <li>
-                * What ? (What it is it, what are the goals, who is concerned){" "}
-              </li>
-              <li>
-                * How ? (How do you think you can do it ? What are the required
-                steps ?)
-              </li>
-            </ul>
-            <p>After creation, you can move your card to the todo list.</p>
-          </div>
+          {editDescription ? (
+            <EditDescription setEditDescription={setEditDescription} />
+          ) : (
+            <div className="font-light text-sm text-[#000000] mb-4">
+              <p>
+                Ideas are created and share here through a card. Here you can
+                describe what you'd like to accomplish. For example you can
+                follow three simple questions to create the card related to your
+                idea:
+              </p>
+              <ul>
+                <li>* Why ? (Why do you wish to do it ?)</li>
+                <li>
+                  * What ? (What it is it, what are the goals, who is concerned){" "}
+                </li>
+                <li>
+                  * How ? (How do you think you can do it ? What are the
+                  required steps ?)
+                </li>
+              </ul>
+              <p>After creation, you can move your card to the todo list.</p>
+            </div>
+          )}
           <div className="flex text-0.625rem text-greyish-150 items-center font-poppins mb-2">
             <DocText className="h-3 w-3 mr-1" />
             <p className="mr-3">Attachments</p>
