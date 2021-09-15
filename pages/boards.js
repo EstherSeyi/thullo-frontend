@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 import AddBoard from "../components/board-actions/add-board";
 import MemberAvatar from "../components/member-avatar";
@@ -6,9 +7,19 @@ import MemberAvatar from "../components/member-avatar";
 import profilepic from "../public/profilepic.jpeg";
 
 import { useModal } from "../context/modal";
+import { useUser } from "../hooks/auth-hook";
+import { useAppQuery } from "../hooks/query-hook";
 
 export default function Home() {
   const { open } = useModal();
+
+  const { user } = useUser();
+
+  const { data } = useAppQuery("", {
+    url: `boards?_where[members.username_contains]=${user?.username}`,
+  });
+
+  console.log(data);
 
   return (
     <section className="w-11/12 max-w-[1024px] mx-auto mt-8 ">
@@ -19,34 +30,20 @@ export default function Home() {
       >
         Add
       </button>
-      <div className="flex flex-wrap mt-16">
-        <Card
-          id="1"
-          title="Devchallenges Board"
-          members={[
-            {
-              id: "233",
-              image: profilepic,
-            },
-            {
-              id: "243",
-              image: profilepic,
-            },
-            {
-              id: "223",
-              image: profilepic,
-            },
-            {
-              id: "263",
-              image: profilepic,
-            },
-            {
-              id: "263",
-              image: profilepic,
-            },
-          ]}
-        />
-      </div>
+      {data?.length ? (
+        <div className="flex flex-wrap mt-16">
+          {data?.map((board) => (
+            <Card
+              key={board?.id}
+              id={board?.id}
+              title={board?.title}
+              members={board?.members}
+            />
+          ))}
+        </div>
+      ) : (
+        <p>No boards Yet!</p>
+      )}
     </section>
   );
 }
@@ -64,7 +61,7 @@ const Card = ({ title, members }) => {
             members
               ?.slice(0, 3)
               ?.map((member) => (
-                <MemberAvatar imgSrc={member.image} key={member.id} />
+                <MemberAvatar imgSrc={profilepic} key={member.id} />
               ))}
         </div>
         <span className="font-noto text-greyish-150 text-xs self-center">
