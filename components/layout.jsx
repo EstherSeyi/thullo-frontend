@@ -1,6 +1,7 @@
 import Head from "next/head";
 import Image from "next/image";
 import { useRouter } from "next/router";
+import { useState, useRef, useEffect } from "react";
 
 import Search from "./icons/search";
 import ChevronDown from "./icons/chevron-down";
@@ -9,8 +10,24 @@ import ViewGrid from "./icons/view-grid";
 import logo from "../public/Logo.svg";
 import profilepic from "../public/profilepic.jpeg";
 
+import useClickOutside from "../hooks/use-click-outside";
+import { useUser } from "../hooks/auth-hook";
+
 export default function Layout({ children, cardName }) {
   const router = useRouter();
+  const { user } = useUser();
+  const [userData, setUserData] = useState({});
+  const [showQuickAction, setShowQuickAction] = useState(false);
+  const quickActionRef = useRef(null);
+
+  useClickOutside(quickActionRef, () => {
+    return showQuickAction && setShowQuickAction(false);
+  });
+
+  useEffect(() => {
+    setUserData(user);
+  }, [user]);
+
   return (
     <>
       <Head>
@@ -37,7 +54,7 @@ export default function Layout({ children, cardName }) {
             </div>
           </div>
 
-          <div className="flex">
+          <div className="flex relative">
             <button
               className=" sm:hidden p-1 rounded-md bg-blueish-100 mr-4"
               onClick={() => router.push("/search")}
@@ -59,9 +76,25 @@ export default function Layout({ children, cardName }) {
               width={25}
               height={8}
             />
-            <span className="hidden sm:flex self-end ml-1 text-xs font-bold">
-              Tonye Akin <ChevronDown />
-            </span>
+            <button
+              className="hidden sm:flex self-end ml-1 text-xs font-bold"
+              onClick={() => setShowQuickAction((prevState) => !prevState)}
+            >
+              {userData?.username} <ChevronDown />
+            </button>
+            {showQuickAction && (
+              <ul
+                className="absolute text-0.625rem text-greyish-100 bg-misc-white right-0 top-8 w-20 border border-greyish-250 p-2 rounded-lg z-10"
+                ref={quickActionRef}
+              >
+                <li
+                  className="border-b border-greyish-250  text-misc-red cursor-pointer"
+                  onClick={() => router.push("/logout")}
+                >
+                  Logout
+                </li>
+              </ul>
+            )}
           </div>
         </div>
       </header>
