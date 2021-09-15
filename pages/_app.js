@@ -8,6 +8,7 @@ import { ModalProvider } from "../context/modal";
 import Modal from "../components/modal";
 import Layout from "../components/layout";
 import AuthLayout from "../components/auth-layout";
+import PrivateRoutes from "../components/private-routes";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -21,18 +22,27 @@ const queryClient = new QueryClient({
 function MyApp({ Component, pageProps }) {
   const { query, pathname } = useRouter();
 
+  const authRoutes = [
+    "/login",
+    "/register",
+    "/forgot-password",
+    "/reset-password",
+  ];
+
   return (
     <QueryClientProvider client={queryClient}>
       <ModalProvider>
         <Modal />
-        {pathname?.includes("login") || pathname?.includes("register") ? (
+        {authRoutes?.includes(pathname) ? (
           <AuthLayout>
             <Component {...pageProps} />
           </AuthLayout>
         ) : (
-          <Layout cardName={query.id}>
-            <Component {...pageProps} />
-          </Layout>
+          <PrivateRoutes>
+            <Layout cardName={query.id}>
+              <Component {...pageProps} />
+            </Layout>
+          </PrivateRoutes>
         )}
       </ModalProvider>
       <ReactQueryDevtools initialIsOpen={false} />
