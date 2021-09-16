@@ -21,7 +21,7 @@ const Login = () => {
   const { setUser } = useUser();
   const { mutate, isLoading } = useAppMutation(
     {
-      url: "auth/local",
+      url: "/auth/local",
     },
     {
       onSuccess: (data) => {

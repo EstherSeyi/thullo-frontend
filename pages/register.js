@@ -31,7 +31,7 @@ const Register = () => {
   const { setUser } = useUser();
   const { mutate, isLoading } = useAppMutation(
     {
-      url: "auth/local/register",
+      url: "/auth/local/register",
     },
     {
       onSuccess: (data) => {
