@@ -1,10 +1,10 @@
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import Image from "next/image";
 
 import AddBoard from "../components/board-actions/add-board";
 import MemberAvatar from "../components/member-avatar";
 
-import profilepic from "../public/profilepic.jpeg";
+import coverpic from "../public/cardpics.jpeg";
 
 import { useModal } from "../context/modal";
 import { useUser } from "../hooks/auth-hook";
@@ -15,11 +15,9 @@ export default function Home() {
 
   const { user } = useUser();
 
-  const { data } = useAppQuery("", {
-    url: `boards?_where[members.username_contains]=${user?.username}`,
+  const { data } = useAppQuery(`boards_${user?.id}`, {
+    url: `/boards?_where[members.username_contains]=${user?.username}`,
   });
-
-  console.log(data);
 
   return (
     <section className="w-11/12 max-w-[1024px] mx-auto mt-8 ">
@@ -38,20 +36,37 @@ export default function Home() {
               id={board?.id}
               title={board?.title}
               members={board?.members}
+              cover_image={
+                board?.cover_photo?.formats?.small?.url
+                  ? `${process.env.NEXT_PUBLIC_BASE_URL}${board?.cover_photo?.formats?.small?.url}`
+                  : coverpic
+              }
             />
           ))}
         </div>
       ) : (
-        <p>No boards Yet!</p>
+        <p className="text-sm font-noto font-thin text-center mt-20 text-greyish-100">
+          No boards Yet? Click the "Add" button to create one!
+        </p>
       )}
     </section>
   );
 }
 
-const Card = ({ title, members }) => {
+const Card = ({ title, members, cover_image }) => {
   return (
     <div className="bg-misc-white p-3 rounded-md shadow-lg mr-8 mb-8 w-full max-w-[200px]">
-      <div className="bg-cardpics px-20 py-16 rounded-md"></div>
+      <div className="rounded-md w-full">
+        <Image
+          className="rounded"
+          src={cover_image}
+          alt="avatar"
+          width={450}
+          height={300}
+          objectFit="fill"
+          layout="responsive"
+        />
+      </div>
       <Link href={`/boards/${title}`} className="block mt-2.5 mb-4">
         {title}
       </Link>
@@ -61,7 +76,10 @@ const Card = ({ title, members }) => {
             members
               ?.slice(0, 3)
               ?.map((member) => (
-                <MemberAvatar imgSrc={profilepic} key={member.id} />
+                <MemberAvatar
+                  imgSrc={`https://ui-avatars.com/api/?background=random&name=${member.username}`}
+                  key={member.id}
+                />
               ))}
         </div>
         <span className="font-noto text-greyish-150 text-xs self-center">
