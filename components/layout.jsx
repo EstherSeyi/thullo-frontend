@@ -71,8 +71,8 @@ export default function Layout({ children, cardName }) {
 
             <Image
               className="rounded"
-              src={profilepic}
-              alt="avatar"
+              src={`https://ui-avatars.com/api/?background=random&name=${userData?.username}`}
+              alt={`${userData?.username}'s avatar`}
               width={25}
               height={8}
             />
