@@ -7,7 +7,7 @@ import Photograph from "../icons/photograph";
 
 import { useModal } from "../../context/modal";
 import { useAppMutation } from "../../hooks/query-hook";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 
 const schema = yup.object({
   title: yup.string().required("Title is required"),
@@ -62,17 +62,14 @@ const AddBoard = () => {
       // mutate(values);
     },
   });
-  const getFileName = (file) => {
-    const fileStringArray = file.split("\\");
-    console.log(fileStringArray);
+  const getFileName = () => {
+    const fileStringArray = formik.values.cover_photo.split("\\");
     setFileName(fileStringArray[fileStringArray.length - 1]);
   };
 
-  const memoizedCallback = useCallback(() => {
-    getFileName(formik.values.cover_photo);
+  useEffect(() => {
+    getFileName();
   }, [formik.values.cover_photo]);
-
-  console.log(fileName);
 
   return (
     <form
@@ -110,8 +107,8 @@ const AddBoard = () => {
         value={formik.values.cover_photo}
       />
       <div className="flex text-xs text-greyish-100 justify-between relative">
-        <small className="text-0.625rem text-greyish-100 absolute left-0 -top-4 font-noto font-light">
-          {"x"}
+        <small className="text-0.625rem text-greyish-100 absolute left-0 -top-4 font-noto font-light truncate">
+          {fileName}
         </small>
         <label
           className="px-4 py-1 rounded-md bg-greyish-50 font-light flex-48 flex justify-center cursor-pointer"
@@ -143,6 +140,7 @@ const AddBoard = () => {
         <button
           className="font-light text-greyish-100 hover:bg-greyish-50 px-3 py-1 rounded-md mr-2"
           type="reset"
+          onClick={() => close()}
         >
           Cancel
         </button>
