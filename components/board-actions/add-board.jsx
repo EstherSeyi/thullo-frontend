@@ -11,17 +11,20 @@ import { useState, useCallback, useEffect } from "react";
 
 const schema = yup.object({
   title: yup.string().required("Title is required"),
-  cover_photo: yup
-    .mixed()
-    .test("invalidFormat", "File format is not accepted", (value) => {
-      if (!value) return;
-      return !["audio", "video"].includes(value.split("/")[0].split(":")[1]);
-    }),
+  // cover_photo: yup
+  //   .mixed()
+  //   .test("invalidFormat", "File format is not accepted", (value) => {
+  //     if (!value) return;
+  //     return !["audio", "video"].includes(value.split("/")[0].split(":")[1]);
+  //   }),
 });
 
 const AddBoard = () => {
   const { close } = useModal();
-  const [fileName, setFileName] = useState("");
+  const [file, setFile] = useState({
+    name: "",
+    value: "",
+  });
 
   const { mutate } = useAppMutation({
     url: `/board`,
@@ -31,45 +34,52 @@ const AddBoard = () => {
     e.preventDefault();
   };
 
-  // const handleFileChange = (e) => {
-  //   const { files } = e.target;
-  //   const file = files[0];
+  const handleFileChange = (e) => {
+    const { files } = e.target;
+    const singleFile = files[0];
 
-  //   setFileName(file?.name);
-  //   formik.setFieldValue("cover_photo", files);
-  // };
+    // console.log(singleFile);
 
-  const rebuildData = (file, data) => {
-    console.log({
-      file,
-      data,
-    });
-    // let formData = new FormData();
-    // formData.append("upload", data.upload);
-    // return formData;
+    setFile((prevState) => ({ ...prevState, name: singleFile?.name }));
+
+    const reader = new FileReader();
+
+    reader.onload = function (event) {
+      const { result } = event.target;
+      setFile((prevState) => ({
+        ...prevState,
+        value: result,
+      }));
+      rebuildData({ value: result, name: singleFile.name }, file);
+    };
+
+    reader.readAsDataURL(singleFile);
+  };
+
+  const rebuildData = (data, type = "data") => {
+    let formData = new FormData();
+
+    formData.append("cover_photo", file.value, file.name);
+
+    formData.append("data", JSON.stringify(data));
+
+    return formData;
   };
 
   const formik = useFormik({
     initialValues: {
       title: "",
-      cover_photo: "",
       is_private: true,
     },
     validationSchema: schema,
     validateOnBlur: true,
-    onSubmit: ({ cover_photo, ...rest }) => {
-      rebuildData(cover_photo, rest);
-      // mutate(values);
+    onSubmit: (values) => {
+      const builtData = rebuildData(values);
+
+      console.log(builtData);
+      mutate(builtData);
     },
   });
-  const getFileName = () => {
-    const fileStringArray = formik.values.cover_photo.split("\\");
-    setFileName(fileStringArray[fileStringArray.length - 1]);
-  };
-
-  useEffect(() => {
-    getFileName();
-  }, [formik.values.cover_photo]);
 
   return (
     <form
@@ -102,13 +112,12 @@ const AddBoard = () => {
         id="cover_photo"
         type="file"
         accept="image/*"
-        onChange={formik.handleChange}
+        onChange={handleFileChange}
         name="cover_photo"
-        value={formik.values.cover_photo}
       />
       <div className="flex text-xs text-greyish-100 justify-between relative">
         <small className="text-0.625rem text-greyish-100 absolute left-0 -top-4 font-noto font-light truncate">
-          {fileName}
+          {file.name}
         </small>
         <label
           className="px-4 py-1 rounded-md bg-greyish-50 font-light flex-48 flex justify-center cursor-pointer"
