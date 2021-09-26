@@ -130,6 +130,8 @@ const TaskList = ({ list }) => {
               {list.name}
             </p>
             <EditListName
+              boardID={query.docId}
+              listID={list.id}
               hide={hideEditList}
               setHideEditList={setHideEditList}
               setRename={setRename}
