@@ -122,6 +122,7 @@ const NewListForm = ({ setHideListSetting, hideListSetting, boardId }) => {
     },
     {
       onSuccess: async (data) => {
+        console.log(data);
         await queryClient.invalidateQueries(
           queryKeyGenerator(data?.board?.title).single_board,
           {
@@ -130,7 +131,7 @@ const NewListForm = ({ setHideListSetting, hideListSetting, boardId }) => {
         );
 
         await queryClient.invalidateQueries(
-          queryKeyGenerator(boardId).board_lists,
+          queryKeyGenerator(data?.board?.id).board_lists,
           {
             refetchInactive: true,
           }
