@@ -85,9 +85,7 @@ const BoardTemplate = ({ count, dataQueryKey = "", queryUrl, text = "" }) => {
                           title={board?.title}
                           members={board?.members}
                           cover_image={
-                            board?.cover_photo?.formats?.small?.url
-                              ? `${process.env.NEXT_PUBLIC_BASE_URL}${board?.cover_photo?.formats?.small?.url}`
-                              : coverpic
+                            board?.cover_photo?.formats?.small?.url ?? coverpic
                           }
                         />
                       ))}
