@@ -34,7 +34,7 @@ const BoardMenu = ({ hide, setHideBoard }) => {
   const [editDesc, setEditDesc] = useState(false);
   const menuRef = useRef(null);
 
-  useClickOutside(menuRef, () => setHideBoard(true));
+  useClickOutside(menuRef, () => !hide && setHideBoard(true));
 
   return (
     <div
