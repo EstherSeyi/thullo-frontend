@@ -1,12 +1,62 @@
 import { useRef } from "react";
+import { useQueryClient } from "react-query";
 
 import useClickOutside from "../../hooks/use-click-outside";
-const EditListName = ({ hide, setHideEditList, setRename }) => {
+import { useAppMutation } from "../../hooks/query-hook";
+import { queryKeyGenerator } from "../../helpers/query-key-generator";
+const EditListName = ({
+  hide,
+  setHideEditList,
+  setRename,
+  listID,
+  boardID,
+}) => {
   const editListRef = useRef(null);
+  const queryClient = useQueryClient();
 
   useClickOutside(editListRef, () => {
     return !hide && setHideEditList(true);
   });
+
+  const { mutate, isLoading } = useAppMutation(
+    {
+      url: `/lists/${listID}`,
+      method: "DELETE",
+    },
+    {
+      onSuccess: async (data) => {
+        await queryClient.invalidateQueries(
+          queryKeyGenerator(data?.creator?.id).user_boards,
+          {
+            refetchInactive: true,
+            exact: true,
+          }
+        );
+        await queryClient.invalidateQueries(
+          queryKeyGenerator(boardID).user_boards,
+          {
+            refetchInactive: true,
+            exact: true,
+          }
+        );
+        await queryClient.invalidateQueries(
+          queryKeyGenerator(boardID).board_lists,
+          {
+            refetchInactive: true,
+            exact: true,
+          }
+        );
+        setHideEditList(true);
+      },
+      onSettled: (_, error) => {
+        error && console.log(error);
+      },
+    }
+  );
+
+  const handleListDelete = () => {
+    mutate();
+  };
 
   return (
     <ul
@@ -21,7 +71,13 @@ const EditListName = ({ hide, setHideEditList, setRename }) => {
       >
         Rename
       </li>
-      <li className="py-2 cursor-pointer">Delete this list</li>
+      <li
+        className="py-2 cursor-pointer"
+        role="button"
+        onClick={handleListDelete}
+      >
+        {isLoading ? "Loading..." : "Delete this list"}
+      </li>
     </ul>
   );
 };
