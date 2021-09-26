@@ -4,7 +4,7 @@ module.exports = {
       "images.unsplash.com",
       "quiet-temple-38881.herokuapp.com",
       "ui-avatars.com",
-      // "localhost",
+      "localhost",
     ],
   },
 };
