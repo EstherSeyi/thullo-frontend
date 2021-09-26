@@ -1,5 +1,7 @@
 import { useState, useRef } from "react";
 import styled from "styled-components";
+import { useRouter } from "next/router";
+import { useQueryClient } from "react-query";
 
 import Cancel from "../icons/cancel";
 import { UserInCircle } from "../icons/user";
@@ -12,6 +14,9 @@ import MemberRow from "./member-row";
 
 import profilepic from "../../public/profilepic.jpeg";
 import useClickOutside from "../../hooks/use-click-outside";
+import { useAppQuery, useAppMutation } from "../../hooks/query-hook";
+import { formatDate } from "../../helpers/format-date";
+import { useUser } from "../../hooks/auth-hook";
 
 const MenuDescStyles = styled.div.attrs({
   className: "text-justify text-sm text-misc-black2 w-11/12 mb-6 font-light",
@@ -31,10 +36,47 @@ const MenuDescStyles = styled.div.attrs({
 `;
 
 const BoardMenu = ({ hide, setHideBoard }) => {
+  const { query } = useRouter();
+  const { user } = useUser();
   const [editDesc, setEditDesc] = useState(false);
   const menuRef = useRef(null);
+  const queryClient = useQueryClient();
 
   useClickOutside(menuRef, () => !hide && setHideBoard(true));
+
+  const { data } = useAppQuery(`board_${query.id}`, {
+    url: `/boards/${query.docId}`,
+  });
+
+  console.log(data);
+
+  const { mutate, isLoading } = useAppMutation(
+    {
+      method: "PUT",
+      url: `/boards/${query.docId}`,
+    },
+    {
+      onSuccess: async (data) => {
+        await queryClient.invalidateQueries(`board_${data?.title}`, {
+          refetchInactive: true,
+          exact: true,
+        });
+        await queryClient.invalidateQueries(`boards_${user?.id}`, {
+          refetchInactive: true,
+          exact: true,
+        });
+      },
+      onSettled: (_, error) => {
+        error && console.log(error);
+      },
+    }
+  );
+
+  const handleRemoveUser = (userId) => {
+    mutate({
+      members: data?.members.filter((member) => member.id !== userId),
+    });
+  };
 
   return (
     <div
@@ -44,9 +86,7 @@ const BoardMenu = ({ hide, setHideBoard }) => {
       ref={menuRef}
     >
       <div className="flex justify-between border-b border-greyish-250 pb-2 mb-2">
-        <p className="text-misc-black font-poppins font-bold">
-          Devchallenges Board
-        </p>
+        <p className="text-misc-black font-poppins font-bold">{data?.title}</p>
         <button onClick={() => setHideBoard(true)}>
           <Cancel className="h-5 w-5 text-greyish-200" />
         </button>
@@ -57,12 +97,17 @@ const BoardMenu = ({ hide, setHideBoard }) => {
       </div>
 
       <div className="flex mb-4">
-        <MemberAvatar imgSrc={profilepic} />
+        <MemberAvatar
+          imgSrc={`https://ui-avatars.com/api/?background=random&name=${data?.creator?.username}`}
+          alt={`${data?.creator?.username ?? "user"}'s avatar`}
+        />
         <div className="text-justify">
           <p className="text-misc-black font-poppins font-bold">
-            Daniel Jensen
+            {data?.creator?.username}
           </p>
-          <p className="text-0.625rem text-greyish-150">on 4 July, 2020</p>
+          <p className="text-0.625rem text-greyish-150">
+            on {formatDate(data?.created_at)}
+          </p>
         </div>
       </div>
       <div className="flex text-0.625rem text-greyish-150 items-center font-poppins mb-2">
@@ -78,40 +123,15 @@ const BoardMenu = ({ hide, setHideBoard }) => {
       </div>
 
       {editDesc ? (
-        <MenuDescriptionEditor hide={!editDesc} setEditDesc={setEditDesc} />
+        <MenuDescriptionEditor
+          hide={!editDesc}
+          setEditDesc={setEditDesc}
+          description={data?.description ?? ""}
+        />
       ) : (
-        <MenuDescStyles>
-          <p>Simple board to start on a project.</p>
-
-          <p>Each list can hold items (cards) that represent ideas or tasks.</p>
-
-          <p>There 4 lists here:</p>
-
-          <ul>
-            <li>
-              {" "}
-              <strong>Backlog</strong> 🤔 : Ideas are created here. Here people
-              can describe the idea following three simple questions: Why you
-              wish to do it, What it is, how can you do it.
-            </li>
-
-            <li>
-              {" "}
-              <strong>In Progress</strong>📚: Once the ideas is clearly defined,
-              the task can move to #todo stage. Here the owner of the idea can
-              move to #doing once s/he is ready. He can also wait a bit for
-              other members to join.
-            </li>
-            <li>
-              {" "}
-              <strong>In Review</strong> ⚙️: On-going
-            </li>
-            <li>
-              {" "}
-              <strong>Completed</strong> 🙌🏽**: Finished
-            </li>
-          </ul>
-        </MenuDescStyles>
+        <MenuDescStyles
+          dangerouslySetInnerHTML={{ __html: data?.description }}
+        ></MenuDescStyles>
       )}
 
       <div>
@@ -121,9 +141,18 @@ const BoardMenu = ({ hide, setHideBoard }) => {
         </div>
 
         <div className="w-11/12">
-          <MemberRow name="Daniel Jensen" admin={true} imageSrc={profilepic} />
-          <MemberRow name="Bianca Sosa" admin={false} imageSrc={profilepic} />
-          <MemberRow name="Waqar Bloom" admin={false} imageSrc={profilepic} />
+          {data?.members?.map((member) => (
+            <MemberRow
+              key={`member_${member.id}`}
+              name={member?.username}
+              admin={member?.username === data?.creator?.username}
+              imageSrc={`https://ui-avatars.com/api/?background=random&name=${member?.username}`}
+              alt={`${member?.username ?? "user"}'s avatar`}
+              handleRemoveUser={handleRemoveUser}
+              userId={member?.id}
+              removeLoading={isLoading}
+            />
+          ))}
         </div>
       </div>
     </div>
