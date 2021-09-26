@@ -71,6 +71,7 @@ module.exports = {
       },
       gridTemplateColumns: {
         200: "repeat(auto-fit, minmax(200px, 1fr));",
+        automax: "repeat(auto-fit, minmax(250px, 275px))",
       },
       flex: {
         45: "0 0 45%",
