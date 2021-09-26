@@ -4,8 +4,9 @@ import "suneditor/dist/css/suneditor.min.css";
 import { useRouter } from "next/router";
 import { useQueryClient } from "react-query";
 
-import { useAppQuery, useAppMutation } from "../../hooks/query-hook";
+import { useAppMutation } from "../../hooks/query-hook";
 import { useUser } from "../../hooks/auth-hook";
+import { queryKeyGenerator } from "../../helpers/query-key-generator";
 
 const SunEditor = dynamic(() => import("suneditor-react"), {
   ssr: false,
@@ -38,10 +39,13 @@ const MenuDescriptionEditor = ({ setEditDesc, description }) => {
     },
     {
       onSuccess: async (data) => {
-        await queryClient.invalidateQueries(`board_${data?.title}`, {
-          refetchInactive: true,
-          exact: true,
-        });
+        await queryClient.invalidateQueries(
+          queryKeyGenerator(data?.title).user_boards,
+          {
+            refetchInactive: true,
+            exact: true,
+          }
+        );
         await queryClient.invalidateQueries(`boards_${user?.id}`, {
           refetchInactive: true,
           exact: true,

@@ -10,6 +10,7 @@ import { useModal } from "../../context/modal";
 import { useUser } from "../../hooks/auth-hook";
 import { useAppMutation } from "../../hooks/query-hook";
 import { useState } from "react";
+import { queryKeyGenerator } from "../../helpers/query-key-generator";
 
 const schema = yup.object({
   title: yup.string().required("Title is required"),
@@ -31,10 +32,13 @@ const AddBoard = () => {
     },
     {
       onSuccess: async (data) => {
-        await queryClient.invalidateQueries(`boards_${data?.creator?.id}`, {
-          refetchInactive: true,
-          exact: true,
-        });
+        await queryClient.invalidateQueries(
+          queryKeyGenerator(data?.creator?.id).user_boards,
+          {
+            refetchInactive: true,
+            exact: true,
+          }
+        );
         close();
       },
       onSettled: (_, error) => {

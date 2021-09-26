@@ -7,6 +7,7 @@ import cardpic from "../../public/cardpics.jpeg";
 import useClickOutside from "../../hooks/use-click-outside";
 import { useAppQuery, useAppMutation } from "../../hooks/query-hook";
 import { useUser } from "../../hooks/auth-hook";
+import { queryKeyGenerator } from "../../helpers/query-key-generator";
 
 import { LockClosed, LockOpen } from "../../components/icons/lock";
 import TaskList from "../../components/list-actions";
@@ -22,7 +23,7 @@ const Board = () => {
   const { query } = useRouter();
   const { user } = useUser();
 
-  const { data } = useAppQuery(`board_${query.id}`, {
+  const { data } = useAppQuery(queryKeyGenerator(query.id).user_boards, {
     url: `/boards/${query.docId}`,
   });
 
@@ -170,10 +171,13 @@ const VisibilityOptions = ({
     },
     {
       onSuccess: async (data) => {
-        await queryClient.invalidateQueries(`board_${data?.title}`, {
-          refetchInactive: true,
-          exact: true,
-        });
+        await queryClient.invalidateQueries(
+          queryKeyGenerator(data?.title).user_boards,
+          {
+            refetchInactive: true,
+            exact: true,
+          }
+        );
         setHideVisibility(true);
       },
       onSettled: (_, error) => {

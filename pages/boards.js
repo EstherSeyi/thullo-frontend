@@ -6,18 +6,20 @@ import BoardTemplate from "../components/board-template";
 import { useModal } from "../context/modal";
 import { useUser } from "../hooks/auth-hook";
 import request from "../helpers/request";
+import { queryKeyGenerator } from "../helpers/query-key-generator";
 
 export default function Home() {
   const { open } = useModal();
 
   const { user } = useUser();
-  const { data: count } = useQuery("board-counts", () =>
+  const { data: count } = useQuery(queryKeyGenerator().board_count, () =>
     request.get(
       `/boards/count?_where[1][members.username_contains]=${user?.username}`
     )
   );
-  const { data: publicCount } = useQuery("public-board-counts", () =>
-    request.get("/boards/count?_where[0][is_private]=false")
+  const { data: publicCount } = useQuery(
+    queryKeyGenerator().public_board_count,
+    () => request.get("/boards/count?_where[0][is_private]=false")
   );
 
   return (

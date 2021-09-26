@@ -10,6 +10,7 @@ import Search from "../icons/search";
 import useClickOutside from "../../hooks/use-click-outside";
 import { useAppQuery, useAppMutation } from "../../hooks/query-hook";
 import { useUser } from "../../hooks/auth-hook";
+import { queryKeyGenerator } from "../../helpers/query-key-generator";
 
 const BoardMembers = ({ members, sm = true }) => {
   const { user } = useUser();
@@ -20,7 +21,7 @@ const BoardMembers = ({ members, sm = true }) => {
   const [invite, setInvite] = useState(false);
   useClickOutside(inviteMemberRef, () => invite && setInvite(false));
 
-  const { data, isLoading } = useAppQuery("all_users", {
+  const { data, isLoading } = useAppQuery(queryKeyGenerator().users, {
     url: "/users",
   });
 
@@ -31,14 +32,20 @@ const BoardMembers = ({ members, sm = true }) => {
     },
     {
       onSuccess: async (data) => {
-        await queryClient.invalidateQueries(`board_${data?.title}`, {
-          refetchInactive: true,
-          exact: true,
-        });
-        await queryClient.invalidateQueries(`boards_${user?.id}`, {
-          refetchInactive: true,
-          exact: true,
-        });
+        await queryClient.invalidateQueries(
+          queryKeyGenerator(data?.title).user_boards,
+          {
+            refetchInactive: true,
+            exact: true,
+          }
+        );
+        await queryClient.invalidateQueries(
+          queryKeyGenerator(user?.id).user_boards,
+          {
+            refetchInactive: true,
+            exact: true,
+          }
+        );
         setUserIds([]);
         setInvite(false);
       },
