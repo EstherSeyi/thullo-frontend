@@ -60,8 +60,6 @@ const MenuDescriptionEditor = ({ setEditDesc, description }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(state);
-
     mutate({
       description: state.editorContent,
     });

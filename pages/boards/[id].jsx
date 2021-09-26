@@ -39,8 +39,6 @@ const Board = () => {
   const [hideBoardMenu, setHideBoardMenu] = useState(true);
   const [hideListSetting, setHideListSetting] = useState(true);
 
-  console.log(lists);
-
   return (
     <section className="w-11/12 mx-auto h-full">
       <div className="flex justify-between mt-8 mb-4 flex-wrap items-center">
