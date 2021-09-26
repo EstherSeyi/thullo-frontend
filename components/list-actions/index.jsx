@@ -152,7 +152,9 @@ const TaskList = ({ list }) => {
           text="Add another card"
           onClick={() => setShowCardSettings(true)}
         />
-        {showCardSettings && <NewCardForm showForm={setShowCardSettings} />}
+        {showCardSettings && (
+          <NewCardForm showForm={setShowCardSettings} listID={list.id} />
+        )}
       </div>
     </div>
   );
