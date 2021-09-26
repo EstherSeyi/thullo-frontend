@@ -6,6 +6,7 @@ import { useQueryClient } from "react-query";
 import cardpic from "../../public/cardpics.jpeg";
 import useClickOutside from "../../hooks/use-click-outside";
 import { useAppQuery, useAppMutation } from "../../hooks/query-hook";
+import { useUser } from "../../hooks/auth-hook";
 
 import { LockClosed, LockOpen } from "../../components/icons/lock";
 import TaskList from "../../components/list-actions";
@@ -19,12 +20,11 @@ import Cancel from "../../components/icons/cancel";
 
 const Board = () => {
   const { query } = useRouter();
+  const { user } = useUser();
 
   const { data } = useAppQuery(`board_${query.id}`, {
     url: `/boards/${query.docId}`,
   });
-
-  // console.log(data);
 
   const [hideVisibility, setHideVisibility] = useState(true);
   const [hideBoardMenu, setHideBoardMenu] = useState(true);
@@ -54,6 +54,7 @@ const Board = () => {
               docId={query.docId}
               hide={hideVisibility}
               setHideVisibility={setHideVisibility}
+              isCreator={data?.creator.username === user?.username}
             />
           </button>
 
