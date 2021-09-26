@@ -1,10 +1,12 @@
 import Image from "next/image";
 import { useRef, useState } from "react";
+import sanitizeHtml from "sanitize-html";
 
 import cardpic from "../../public/cardpics.jpeg";
 import profilepic from "../../public/profilepic.jpeg";
 import { useModal } from "../../context/modal";
 import useClickOutside from "../../hooks/use-click-outside";
+import { useAppQuery } from "../../hooks/query-hook";
 
 import DocText from "../icons/doc-text";
 import Pencil from "../icons/pencil";
@@ -19,7 +21,7 @@ import PhotoSearch from "./photo-search";
 import AddLabel from "./add-label";
 import EditDescription from "./edit-description";
 
-const NewCard = () => {
+const EditCard = ({ cardID }) => {
   const { close } = useModal();
   const membersRef = useRef(null);
   const coverRef = useRef(null);
@@ -35,6 +37,10 @@ const NewCard = () => {
   });
   useClickOutside(labelRef, () => {
     return openLabel && setOpenLabel(false);
+  });
+
+  const { data: card } = useAppQuery(`card_${cardID}`, {
+    url: `/cards/${cardID}`,
   });
 
   return (
@@ -57,8 +63,8 @@ const NewCard = () => {
       />
       <div className="flex mt-4 flex-col sm:flex-row justify-between">
         <div className="flex-70 mr-4">
-          <p>✋🏿 Move anything that is actually started here</p>
-          <p className="mb-3">in list In Progress</p>
+          <p>{card?.title}</p>
+          <p className="mb-3 font-light text-sm"> {card?.list?.name}</p>
           <div className="flex text-0.625rem text-greyish-150 items-center font-poppins mb-2">
             <DocText className="h-3 w-3 mr-1" />
             <p className="mr-3">Description</p>
@@ -73,27 +79,18 @@ const NewCard = () => {
             )}
           </div>
           {editDescription ? (
-            <EditDescription setEditDescription={setEditDescription} />
+            <EditDescription
+              setEditDescription={setEditDescription}
+              cardID={card?.id}
+              description={card?.description}
+            />
           ) : (
-            <div className="font-light text-sm text-[#000000] mb-4">
-              <p>
-                Ideas are created and share here through a card. Here you can
-                describe what you'd like to accomplish. For example you can
-                follow three simple questions to create the card related to your
-                idea:
-              </p>
-              <ul>
-                <li>* Why ? (Why do you wish to do it ?)</li>
-                <li>
-                  * What ? (What it is it, what are the goals, who is concerned){" "}
-                </li>
-                <li>
-                  * How ? (How do you think you can do it ? What are the
-                  required steps ?)
-                </li>
-              </ul>
-              <p>After creation, you can move your card to the todo list.</p>
-            </div>
+            <div
+              className="font-light text-sm text-[#000000] mb-4"
+              dangerouslySetInnerHTML={{
+                __html: sanitizeHtml(card?.description ?? ""),
+              }}
+            ></div>
           )}
           <div className="flex text-0.625rem text-greyish-150 items-center font-poppins mb-2">
             <DocText className="h-3 w-3 mr-1" />
@@ -148,7 +145,11 @@ const NewCard = () => {
           </div>
 
           <div className="relative text-xs text-greyish-100 font-light flex sm:flex-col">
-            <PhotoSearch openCover={openCover} coverRef={coverRef} />
+            <PhotoSearch
+              openCover={openCover}
+              coverRef={coverRef}
+              cardID={card?.id}
+            />
             <AddMember openMembers={openMembers} membersRef={membersRef} />
             <AddLabel openLabel={openLabel} labelRef={labelRef} />
             <SideButton
@@ -297,4 +298,4 @@ const AddMember = ({ openMembers, membersRef }) => {
   );
 };
 
-export default NewCard;
+export default EditCard;
