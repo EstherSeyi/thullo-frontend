@@ -50,7 +50,8 @@ const BoardTemplate = ({ count, dataQueryKey = "", queryUrl, text = "" }) => {
           id="unsplash-image-thumbnails"
         >
           <div className="w-full box-content pr-[17px] overflow-y-scroll">
-            {infinitData?.pages?.length ? (
+            {infinitData?.pages?.length &&
+            infinitData?.pages[0]?.data?.length ? (
               <InfiniteScroll
                 dataLength={infinitData?.pages?.length}
                 hasMore={hasNextPage}
