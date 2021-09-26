@@ -1,67 +1,67 @@
 import { useFormik } from "formik";
 import * as yup from "yup";
+import { useQueryClient } from "react-query";
 
 import Cancel from "../icons/cancel";
 import { LockClosed, LockOpen } from "../icons/lock";
 import Photograph from "../icons/photograph";
 
 import { useModal } from "../../context/modal";
+import { useUser } from "../../hooks/auth-hook";
 import { useAppMutation } from "../../hooks/query-hook";
-import { useState, useCallback, useEffect } from "react";
+import { useState } from "react";
 
 const schema = yup.object({
   title: yup.string().required("Title is required"),
-  // cover_photo: yup
-  //   .mixed()
-  //   .test("invalidFormat", "File format is not accepted", (value) => {
-  //     if (!value) return;
-  //     return !["audio", "video"].includes(value.split("/")[0].split(":")[1]);
-  //   }),
+  cover_photo: yup.mixed(),
 });
 
 const AddBoard = () => {
+  const queryClient = useQueryClient();
+  const { user } = useUser();
   const { close } = useModal();
   const [file, setFile] = useState({
     name: "",
     value: "",
   });
 
-  const { mutate } = useAppMutation({
-    url: `/board`,
-  });
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-  };
+  const { mutate } = useAppMutation(
+    {
+      url: `/boards`,
+    },
+    {
+      onSuccess: async (data) => {
+        await queryClient.invalidateQueries(`boards_${data?.creator?.id}`, {
+          refetchInactive: true,
+          exact: true,
+        });
+        close();
+      },
+      onSettled: (_, error) => {
+        error && console.log(error);
+      },
+    }
+  );
 
   const handleFileChange = (e) => {
     const { files } = e.target;
-    const singleFile = files[0];
+    const file = files[0];
+    setFile((prevState) => ({
+      ...prevState,
+      value: file,
+      name: file.name,
+    }));
 
-    // console.log(singleFile);
-
-    setFile((prevState) => ({ ...prevState, name: singleFile?.name }));
-
-    const reader = new FileReader();
-
-    reader.onload = function (event) {
-      const { result } = event.target;
-      setFile((prevState) => ({
-        ...prevState,
-        value: result,
-      }));
-      rebuildData({ value: result, name: singleFile.name }, file);
-    };
-
-    reader.readAsDataURL(singleFile);
+    formik.setFieldValue("cover_photo", file);
   };
 
-  const rebuildData = (data, type = "data") => {
-    let formData = new FormData();
-
-    formData.append("cover_photo", file.value, file.name);
-
-    formData.append("data", JSON.stringify(data));
+  const rebuildData = (data) => {
+    const formData = new FormData();
+    formData.append("files.cover_photo", file.value, file.name);
+    formData.append(
+      "data",
+      JSON.stringify({ ...data, creator: user?.id, members: [user?.id] })
+    );
 
     return formData;
   };
@@ -70,13 +70,12 @@ const AddBoard = () => {
     initialValues: {
       title: "",
       is_private: true,
+      cover_photo: "",
     },
     validationSchema: schema,
     validateOnBlur: true,
-    onSubmit: (values) => {
-      const builtData = rebuildData(values);
-
-      console.log(builtData);
+    onSubmit: ({ is_private, title }) => {
+      const builtData = rebuildData({ is_private, title });
       mutate(builtData);
     },
   });
