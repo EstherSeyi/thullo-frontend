@@ -28,10 +28,19 @@ const Board = () => {
   const { data } = useAppQuery(queryKeyGenerator(query.id).user_boards, {
     url: `/boards/${query.docId}`,
   });
+  const { data: lists } = useAppQuery(
+    queryKeyGenerator(query.docId).board_lists,
+    {
+      url: "/lists",
+    }
+  );
 
   const [hideVisibility, setHideVisibility] = useState(true);
   const [hideBoardMenu, setHideBoardMenu] = useState(true);
   const [hideListSetting, setHideListSetting] = useState(true);
+
+  console.log(lists);
+
   return (
     <section className="w-11/12 mx-auto h-full">
       <div className="flex justify-between mt-8 mb-4 flex-wrap items-center">
@@ -78,50 +87,58 @@ const Board = () => {
       <BoardMembers members={data?.members} />
 
       <div className="h-full bg-blueish-50 rounded-3xl pt-7 px-4 pb-2">
-        <div className="h-full flex max-w-full overflow-x-scroll">
-          <TaskList
-            list={{
-              name: "Todos",
-              cards: [
-                {
-                  title: "✋🏿 Add what you'd like to work on below",
-                  attachments: [],
-                  comments: [1, 2, 3, 4],
-                  tags: [
-                    {
-                      id: "001",
-                      name: "technical",
-                    },
-                  ],
-                },
-                {
-                  imageSrc: cardpic,
-                  title: "Github jobs challenge",
-                  attachments: [1, 2],
-                  comments: [1, 2, 3, 4],
-                  tags: [
-                    {
-                      id: "001",
-                      name: "technical",
-                    },
-                  ],
-                },
-              ],
-            }}
-          />
-          <div className="relative">
-            <AddAnother
-              text="Add another list"
-              classes="min-w-[250px] h-8"
-              onClick={() => setHideListSetting(false)}
-            />
-            <NewListForm
-              hideListSetting={hideListSetting}
-              setHideListSetting={setHideListSetting}
-              boardId={query.docId}
-            />
+        {lists?.length ? (
+          <div className="h-full flex max-w-full overflow-x-scroll">
+            {lists.map((list) => (
+              <TaskList
+                key={list.id}
+                list={
+                  list
+                  //   {
+                  //   name: "Todos",
+                  //   cards: [
+                  //     {
+                  //       title: "✋🏿 Add what you'd like to work on below",
+                  //       attachments: [],
+                  //       comments: [1, 2, 3, 4],
+                  //       tags: [
+                  //         {
+                  //           id: "001",
+                  //           name: "technical",
+                  //         },
+                  //       ],
+                  //     },
+                  //     {
+                  //       imageSrc: cardpic,
+                  //       title: "Github jobs challenge",
+                  //       attachments: [1, 2],
+                  //       comments: [1, 2, 3, 4],
+                  //       tags: [
+                  //         {
+                  //           id: "001",
+                  //           name: "technical",
+                  //         },
+                  //       ],
+                  //     },
+                  //   ],
+                  // }
+                }
+              />
+            ))}
+            <div className="relative">
+              <AddAnother
+                text="Add another list"
+                classes="min-w-[250px] h-8"
+                onClick={() => setHideListSetting(false)}
+              />
+              <NewListForm
+                hideListSetting={hideListSetting}
+                setHideListSetting={setHideListSetting}
+                boardId={query.docId}
+              />
+            </div>
           </div>
-        </div>
+        ) : null}
       </div>
     </section>
   );
