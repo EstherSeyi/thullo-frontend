@@ -2,6 +2,7 @@ import { useState, useRef } from "react";
 import styled from "styled-components";
 import { useRouter } from "next/router";
 import { useQueryClient } from "react-query";
+import sanitizeHtml from "sanitize-html";
 
 import Cancel from "../icons/cancel";
 import { UserInCircle } from "../icons/user";
@@ -60,14 +61,12 @@ const BoardMenu = ({ hide, setHideBoard }) => {
           queryKeyGenerator(data?.title).user_boards,
           {
             refetchInactive: true,
-            exact: true,
           }
         );
         await queryClient.invalidateQueries(
           queryKeyGenerator(user?.id).user_boards,
           {
             refetchInactive: true,
-            exact: true,
           }
         );
       },
@@ -135,7 +134,9 @@ const BoardMenu = ({ hide, setHideBoard }) => {
         />
       ) : (
         <MenuDescStyles
-          dangerouslySetInnerHTML={{ __html: data?.description }}
+          dangerouslySetInnerHTML={{
+            __html: sanitizeHtml(data?.description ?? ""),
+          }}
         ></MenuDescStyles>
       )}
 
