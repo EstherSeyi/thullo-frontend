@@ -40,19 +40,19 @@ const TaskList = ({ list }) => {
     {
       onSuccess: async (data) => {
         await queryClient.invalidateQueries(
-          queryKeyGenerator(data?.creator?.id).user_boards,
+          queryKeyGenerator(data?.board?.creator?.id).user_boards,
           {
             refetchInactive: true,
           }
         );
         await queryClient.invalidateQueries(
-          queryKeyGenerator(query.docId).user_boards,
+          queryKeyGenerator(data?.board?.title).single_board,
           {
             refetchInactive: true,
           }
         );
         await queryClient.invalidateQueries(
-          queryKeyGenerator(query.docId).board_lists,
+          queryKeyGenerator(data?.board?.id).board_lists,
           {
             refetchInactive: true,
           }

@@ -40,7 +40,7 @@ const MenuDescriptionEditor = ({ setEditDesc, description }) => {
     {
       onSuccess: async (data) => {
         await queryClient.invalidateQueries(
-          queryKeyGenerator(data?.title).user_boards,
+          queryKeyGenerator(data?.id).single_board,
           {
             refetchInactive: true,
           }

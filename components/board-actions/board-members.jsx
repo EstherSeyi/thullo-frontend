@@ -34,13 +34,13 @@ const BoardMembers = ({ members, sm = true }) => {
     {
       onSuccess: async (data) => {
         await queryClient.invalidateQueries(
-          queryKeyGenerator(data?.title).user_boards,
+          queryKeyGenerator(user?.id).user_boards,
           {
             refetchInactive: true,
           }
         );
         await queryClient.invalidateQueries(
-          queryKeyGenerator(user?.id).user_boards,
+          queryKeyGenerator(data.title).single_board,
           {
             refetchInactive: true,
           }

@@ -25,15 +25,9 @@ const Board = () => {
   const { query } = useRouter();
   const { user } = useUser();
 
-  const { data } = useAppQuery(queryKeyGenerator(query.id).user_boards, {
+  const { data } = useAppQuery(queryKeyGenerator(query.id).single_board, {
     url: `/boards/${query.docId}`,
   });
-  const { data: lists } = useAppQuery(
-    queryKeyGenerator(query.docId).board_lists,
-    {
-      url: "/lists",
-    }
-  );
 
   const [hideVisibility, setHideVisibility] = useState(true);
   const [hideBoardMenu, setHideBoardMenu] = useState(true);
@@ -85,57 +79,31 @@ const Board = () => {
       <BoardMembers members={data?.members} />
 
       <div className="h-full bg-blueish-50 rounded-3xl pt-7 px-4 pb-2">
-        {lists?.length ? (
-          <div className="h-full flex max-w-full overflow-x-scroll">
-            {lists.map((list) => (
-              <TaskList
-                key={list.id}
-                list={
-                  list
-                  //   {
-                  //   name: "Todos",
-                  //   cards: [
-                  //     {
-                  //       title: "✋🏿 Add what you'd like to work on below",
-                  //       attachments: [],
-                  //       comments: [1, 2, 3, 4],
-                  //       tags: [
-                  //         {
-                  //           id: "001",
-                  //           name: "technical",
-                  //         },
-                  //       ],
-                  //     },
-                  //     {
-                  //       imageSrc: cardpic,
-                  //       title: "Github jobs challenge",
-                  //       attachments: [1, 2],
-                  //       comments: [1, 2, 3, 4],
-                  //       tags: [
-                  //         {
-                  //           id: "001",
-                  //           name: "technical",
-                  //         },
-                  //       ],
-                  //     },
-                  //   ],
-                  // }
-                }
-              />
-            ))}
-            <div className="relative">
-              <AddAnother
-                text="Add another list"
-                classes="min-w-[250px] h-8"
-                onClick={() => setHideListSetting(false)}
-              />
-              <NewListForm
-                hideListSetting={hideListSetting}
-                setHideListSetting={setHideListSetting}
-                boardId={query.docId}
-              />
-            </div>
+        <div className="h-full flex max-w-full overflow-x-scroll">
+          {data?.lists?.length ? (
+            <>
+              {data?.lists.map((list) => (
+                <TaskList key={list.id} list={list} />
+              ))}
+            </>
+          ) : null}
+          <div className="relative">
+            <AddAnother
+              text="Add another list"
+              classes="min-w-[250px] h-8"
+              onClick={() => setHideListSetting(false)}
+            />
+            <NewListForm
+              hideListSetting={hideListSetting}
+              setHideListSetting={setHideListSetting}
+              boardId={query.docId}
+            />
           </div>
+        </div>
+        {!data?.lists?.length ? (
+          <p className="text-sm font-noto font-thin text-center mt-20 text-greyish-100 absolute top-1/3 left-1/2">
+            No list in this board yet!
+          </p>
         ) : null}
       </div>
     </section>
@@ -155,24 +123,16 @@ const NewListForm = ({ setHideListSetting, hideListSetting, boardId }) => {
     {
       onSuccess: async (data) => {
         await queryClient.invalidateQueries(
-          queryKeyGenerator(data?.creator?.id).user_boards,
+          queryKeyGenerator(data?.board?.title).single_board,
           {
             refetchInactive: true,
-            exact: true,
           }
         );
-        await queryClient.invalidateQueries(
-          queryKeyGenerator(boardId).user_boards,
-          {
-            refetchInactive: true,
-            exact: true,
-          }
-        );
+
         await queryClient.invalidateQueries(
           queryKeyGenerator(boardId).board_lists,
           {
             refetchInactive: true,
-            exact: true,
           }
         );
         setHideListSetting(true);
@@ -255,10 +215,9 @@ const VisibilityOptions = ({
     {
       onSuccess: async (data) => {
         await queryClient.invalidateQueries(
-          queryKeyGenerator(data?.title).user_boards,
+          queryKeyGenerator(data?.title).single_board,
           {
             refetchInactive: true,
-            exact: true,
           }
         );
         setHideVisibility(true);

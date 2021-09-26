@@ -32,7 +32,7 @@ const NewCardForm = ({ showForm, listID }) => {
           }
         );
         await queryClient.invalidateQueries(
-          queryKeyGenerator(query.docId).user_boards,
+          queryKeyGenerator(data?.title).single_board,
           {
             refetchInactive: true,
           }

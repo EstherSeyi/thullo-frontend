@@ -46,7 +46,7 @@ const BoardMenu = ({ hide, setHideBoard }) => {
 
   useClickOutside(menuRef, () => !hide && setHideBoard(true));
 
-  const { data } = useAppQuery(queryKeyGenerator(query.id).user_boards, {
+  const { data } = useAppQuery(queryKeyGenerator(query.id).single_board, {
     url: `/boards/${query.docId}`,
   });
 
@@ -58,7 +58,7 @@ const BoardMenu = ({ hide, setHideBoard }) => {
     {
       onSuccess: async (data) => {
         await queryClient.invalidateQueries(
-          queryKeyGenerator(data?.title).user_boards,
+          queryKeyGenerator(data?.title).single_board,
           {
             refetchInactive: true,
           }

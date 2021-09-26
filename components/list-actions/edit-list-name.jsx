@@ -32,7 +32,7 @@ const EditListName = ({
           }
         );
         await queryClient.invalidateQueries(
-          queryKeyGenerator(boardID).user_boards,
+          queryKeyGenerator(data?.id).single_board,
           {
             refetchInactive: true,
           }
