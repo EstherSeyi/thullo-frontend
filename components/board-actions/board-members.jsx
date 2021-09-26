@@ -1,24 +1,69 @@
 import { useState, useRef } from "react";
 import Image from "next/image";
+import { useRouter } from "next/router";
+import { useQueryClient } from "react-query";
 
 import MemberAvatar from "../member-avatar";
 import Plus from "../icons/plus";
 import Search from "../icons/search";
 
 import useClickOutside from "../../hooks/use-click-outside";
-import { useAppQuery } from "../../hooks/query-hook";
+import { useAppQuery, useAppMutation } from "../../hooks/query-hook";
+import { useUser } from "../../hooks/auth-hook";
 
 const BoardMembers = ({ members, sm = true }) => {
+  const { user } = useUser();
+  const [userIds, setUserIds] = useState([]);
+  const queryClient = useQueryClient();
+  const { query } = useRouter();
   const inviteMemberRef = useRef(null);
   const [invite, setInvite] = useState(false);
-  useClickOutside(inviteMemberRef, () => setInvite(false));
+  useClickOutside(inviteMemberRef, () => invite && setInvite(false));
 
   const { data, isLoading } = useAppQuery("all_users", {
     url: "/users",
   });
 
+  const { mutate, inviteLoading } = useAppMutation(
+    {
+      method: "PUT",
+      url: `/boards/${query.docId}`,
+    },
+    {
+      onSuccess: async (data) => {
+        await queryClient.invalidateQueries(`board_${data?.title}`, {
+          refetchInactive: true,
+          exact: true,
+        });
+        await queryClient.invalidateQueries(`boards_${user?.id}`, {
+          refetchInactive: true,
+          exact: true,
+        });
+        setUserIds([]);
+        setInvite(false);
+      },
+      onSettled: (_, error) => {
+        error && console.log(error);
+      },
+    }
+  );
+
   const handleUserChoice = (userId) => {
-    console.log(userId);
+    if (!members?.some((member) => member.id === userId)) {
+      !userIds.includes(userId)
+        ? setUserIds((prevState) => [...prevState, userId])
+        : setUserIds((prevState) => prevState.filter((id) => id !== userId));
+    }
+  };
+
+  const handleInvite = () => {
+    if (userIds?.length) {
+      mutate({
+        members: [...members, ...userIds],
+      });
+    }
+
+    return;
   };
 
   return (
@@ -67,7 +112,7 @@ const BoardMembers = ({ members, sm = true }) => {
               <Search className="text-misc-white h-4 w-4" />
             </button>
           </form>
-          <div className="border border-greyish-250 rounded-lg p-3 mb-6 max-h-40 overflow-y-scroll">
+          <div className="border border-greyish-250 rounded-lg p-3 mb-6 max-h-40 overflow-y-scroll font-light">
             {isLoading ? (
               <p className="flex justify-center items-center text-0.625rem font-light">
                 <span>Loading...</span>
@@ -75,20 +120,33 @@ const BoardMembers = ({ members, sm = true }) => {
             ) : data?.length ? (
               data.map((user) => (
                 <div
-                  className="flex py-2 items-center hover:bg-greyish-50"
+                  className={`flex py-2 items-center  ${
+                    members?.some((member) => member.id === user?.id)
+                      ? "cursor-not-allowed"
+                      : "cursor-pointer hover:font-bold"
+                  } justify-between ${
+                    userIds.includes(user?.id) ? "bg-blueish-150" : ""
+                  }`}
                   key={`user_${user?.id}`}
                   onClick={() => handleUserChoice(user?.id)}
                 >
-                  <div className="rounded-lg mr-4">
-                    <Image
-                      className="rounded"
-                      src={`https://ui-avatars.com/api/?background=random&name=${user?.username}`}
-                      alt={user?.username}
-                      width={28}
-                      height={28}
-                    />
+                  <div className="flex">
+                    <div className="rounded-lg mr-4">
+                      <Image
+                        className="rounded"
+                        src={`https://ui-avatars.com/api/?background=random&name=${user?.username}`}
+                        alt={user?.username}
+                        width={28}
+                        height={28}
+                      />
+                    </div>
+                    <p className="text-sm truncate">{user.username}</p>
                   </div>
-                  <p>{user.username}</p>
+                  {members?.some((member) => member.id === user?.id) ? (
+                    <span className="text-0.625rem font-light  text-greyish-100">
+                      member
+                    </span>
+                  ) : null}
                 </div>
               ))
             ) : (
@@ -98,9 +156,14 @@ const BoardMembers = ({ members, sm = true }) => {
             )}
           </div>
 
-          <button className="bg-blueish-250 text-misc-white text-0.625rem py-2 px-6 rounded-lg self-center mb-2.5">
-            Invite
-          </button>
+          {userIds?.length ? (
+            <button
+              className="bg-blueish-250 text-misc-white text-0.625rem py-2 px-6 rounded-lg self-center mb-2.5"
+              onClick={handleInvite}
+            >
+              {inviteLoading ? "Loading..." : "Invite"}
+            </button>
+          ) : null}
         </div>
       </div>
     </div>
