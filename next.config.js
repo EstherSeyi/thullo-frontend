@@ -5,6 +5,7 @@ module.exports = {
       "quiet-temple-38881.herokuapp.com",
       "ui-avatars.com",
       "localhost",
+      "res.cloudinary.com",
     ],
   },
 };
