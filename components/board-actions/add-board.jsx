@@ -26,7 +26,7 @@ const AddBoard = () => {
     value: "",
   });
 
-  const { mutate } = useAppMutation(
+  const { mutate, isLoading } = useAppMutation(
     {
       url: `/boards`,
     },
@@ -160,8 +160,14 @@ const AddBoard = () => {
           className="font-light text-misc-white bg-blueish-250 px-2 py-1 rounded-md"
           type="submit"
         >
-          <span className="mr-2">+</span>
-          Create
+          {isLoading ? (
+            <span>Loading</span>
+          ) : (
+            <>
+              <span className="mr-2">+</span>
+              Create
+            </>
+          )}
         </button>
       </div>
     </form>
