@@ -4,5 +4,6 @@ export const queryKeyGenerator = (extension) => {
     user_boards: `boards_${extension}`,
     board_count: "board_count",
     public_board_count: "board_count",
+    board_lists: `lists_${extension}`,
   };
 };
