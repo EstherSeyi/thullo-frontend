@@ -2,7 +2,7 @@ import { useState, useRef } from "react";
 import { useRouter } from "next/router";
 import { useQueryClient } from "react-query";
 
-import profilepic from "../../public/profilepic.jpeg";
+// import profilepic from "../../public/profilepic.jpeg";
 import cardpic from "../../public/cardpics.jpeg";
 import useClickOutside from "../../hooks/use-click-outside";
 import { useAppQuery, useAppMutation } from "../../hooks/query-hook";
@@ -150,7 +150,12 @@ const NewListForm = ({ setHideListSetting, hideListSetting }) => {
   );
 };
 
-const VisibilityOptions = ({ hide, setHideVisibility, docId }) => {
+const VisibilityOptions = ({
+  hide,
+  setHideVisibility,
+  docId,
+  isCreator = false,
+}) => {
   const queryClient = useQueryClient();
 
   const visibilityRef = useRef(null);
@@ -177,9 +182,12 @@ const VisibilityOptions = ({ hide, setHideVisibility, docId }) => {
   );
 
   const handleVisibility = async (isPrivate) => {
-    await mutate({
-      is_private: isPrivate,
-    });
+    if (isCreator) {
+      await mutate({
+        is_private: isPrivate,
+      });
+    }
+    return;
   };
 
   return (
@@ -192,23 +200,27 @@ const VisibilityOptions = ({ hide, setHideVisibility, docId }) => {
       <p className="text-greyish-200 font-bold mb-1">Visibility</p>
       <p className="mb-4">Choose who can see to this board.</p>
       <ul>
-        <li className="my-4 p-2 rounded-md hover:bg-greyish-50">
-          <div
-            role="button"
-            className="flex mb-2 text-greyish-200"
-            onClick={() => handleVisibility(false)}
-          >
+        <li
+          className={`my-4 p-2 rounded-md hover:bg-greyish-50 ${
+            !isCreator ? "cursor-not-allowed" : ""
+          }`}
+          role="button"
+          onClick={() => handleVisibility(false)}
+        >
+          <div className="flex mb-2 text-greyish-200">
             <Globe className="h-3 w-3 mr-2" />
             <p>Public</p>
           </div>
           <p>Anyone on the internet can see this.</p>
         </li>
-        <li className="my-4 p-2 rounded-md hover:bg-greyish-50">
-          <div
-            role="button"
-            className="flex mb-2 text-greyish-200"
-            onClick={() => handleVisibility(true)}
-          >
+        <li
+          className={`my-4 p-2 rounded-md hover:bg-greyish-50 ${
+            !isCreator ? "cursor-not-allowed" : ""
+          }`}
+          role="button"
+          onClick={() => handleVisibility(false)}
+        >
+          <div className="flex mb-2 text-greyish-200">
             <LockClosed />
             <p className="ml-2">Private </p>
           </div>
