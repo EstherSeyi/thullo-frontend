@@ -32,7 +32,7 @@ const TaskCard = ({ card }) => {
       <div className="mt-6 flex justify-between">
         <button
           className="bg-blueish-250 text-misc-white rounded-md p-0.5"
-          onClick={() => open(<EditCard />)}
+          onClick={() => open(<EditCard cardID={card?.id} />)}
         >
           <Pencil />
         </button>
