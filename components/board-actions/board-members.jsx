@@ -17,6 +17,7 @@ const BoardMembers = ({ members, sm = true }) => {
   const [userIds, setUserIds] = useState([]);
   const queryClient = useQueryClient();
   const { query } = useRouter();
+
   const inviteMemberRef = useRef(null);
   const [invite, setInvite] = useState(false);
   useClickOutside(inviteMemberRef, () => invite && setInvite(false));
@@ -36,14 +37,12 @@ const BoardMembers = ({ members, sm = true }) => {
           queryKeyGenerator(data?.title).user_boards,
           {
             refetchInactive: true,
-            exact: true,
           }
         );
         await queryClient.invalidateQueries(
           queryKeyGenerator(user?.id).user_boards,
           {
             refetchInactive: true,
-            exact: true,
           }
         );
         setUserIds([]);

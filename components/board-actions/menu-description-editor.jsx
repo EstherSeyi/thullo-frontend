@@ -43,12 +43,10 @@ const MenuDescriptionEditor = ({ setEditDesc, description }) => {
           queryKeyGenerator(data?.title).user_boards,
           {
             refetchInactive: true,
-            exact: true,
           }
         );
         await queryClient.invalidateQueries(`boards_${user?.id}`, {
           refetchInactive: true,
-          exact: true,
         });
         setEditDesc(false);
       },

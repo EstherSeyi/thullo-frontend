@@ -29,21 +29,18 @@ const NewCardForm = ({ showForm, listID }) => {
           queryKeyGenerator(data?.creator?.id).user_boards,
           {
             refetchInactive: true,
-            exact: true,
           }
         );
         await queryClient.invalidateQueries(
           queryKeyGenerator(query.docId).user_boards,
           {
             refetchInactive: true,
-            exact: true,
           }
         );
         await queryClient.invalidateQueries(
           queryKeyGenerator(query.docId).board_lists,
           {
             refetchInactive: true,
-            exact: true,
           }
         );
 

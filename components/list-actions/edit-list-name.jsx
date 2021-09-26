@@ -29,21 +29,18 @@ const EditListName = ({
           queryKeyGenerator(data?.creator?.id).user_boards,
           {
             refetchInactive: true,
-            exact: true,
           }
         );
         await queryClient.invalidateQueries(
           queryKeyGenerator(boardID).user_boards,
           {
             refetchInactive: true,
-            exact: true,
           }
         );
         await queryClient.invalidateQueries(
           queryKeyGenerator(boardID).board_lists,
           {
             refetchInactive: true,
-            exact: true,
           }
         );
         setHideEditList(true);
