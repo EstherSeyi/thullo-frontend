@@ -1,12 +1,14 @@
 import Image from "next/image";
 
-const MemberAvatar = ({ imgSrc }) => {
+import profilepic from "../public/profilepic.jpeg";
+
+const MemberAvatar = ({ imgSrc = profilepic, alt = "avatar" }) => {
   return (
     <div className="mr-2">
       <Image
         className="rounded"
         src={imgSrc}
-        alt="avatar"
+        alt={alt}
         width={28}
         height={28}
       />
