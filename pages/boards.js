@@ -29,7 +29,7 @@ export default function Home() {
     `boards_${user?.id}`,
     ({ pageParam = 0 }) => {
       return request.get(
-        `/boards?_where[members.username_contains]=${user?.username}&_limit=8&_start=${pageParam}`
+        `/boards?_where[0][is_private]=false&_where[1][members.username_contains]=${user?.username}&_limit=8&_start=${pageParam}`
       );
     },
     {
@@ -84,7 +84,7 @@ export default function Home() {
           >
             <div
               className={`mt-16 grid ${
-                infinitData?.pages[0]?.data?.length > 1 &&
+                infinitData?.pages[0]?.data?.length >= 1 &&
                 infinitData?.pages[0]?.data?.length < 3
                   ? "grid-cols-automax"
                   : "grid-cols-200"
