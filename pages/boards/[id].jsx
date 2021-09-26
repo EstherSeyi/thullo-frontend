@@ -83,7 +83,7 @@ const Board = () => {
           {data?.lists?.length ? (
             <>
               {data?.lists.map((list) => (
-                <TaskList key={list.id} list={list} />
+                <TaskList key={list.id} listID={list.id} />
               ))}
             </>
           ) : null}

@@ -14,14 +14,14 @@ import TaskCard from "../card-actions/task-card";
 import EditListName from "./edit-list-name";
 
 import useClickOutside from "../../hooks/use-click-outside";
-import { useAppMutation } from "../../hooks/query-hook";
+import { useAppMutation, useAppQuery } from "../../hooks/query-hook";
 import { queryKeyGenerator } from "../../helpers/query-key-generator";
 
 const schema = object({
   name: string().required("Name is required."),
 });
 
-const TaskList = ({ list }) => {
+const TaskList = ({ listID }) => {
   const { query } = useRouter();
   const queryClient = useQueryClient();
   const [hideEditList, setHideEditList] = useState(true);
@@ -32,19 +32,20 @@ const TaskList = ({ list }) => {
 
   useClickOutside(renameRef, () => rename && setRename(false));
 
+  const { data: list } = useAppQuery(`list_${listID}`, {
+    url: `/lists/${listID}`,
+  });
+
   const { mutate, isLoading } = useAppMutation(
     {
-      url: `/lists/${list.id}`,
+      url: `/lists/${listID}`,
       method: "PUT",
     },
     {
       onSuccess: async (data) => {
-        await queryClient.invalidateQueries(
-          queryKeyGenerator(data?.board?.creator?.id).user_boards,
-          {
-            refetchInactive: true,
-          }
-        );
+        await queryClient.invalidateQueries(`list_${listID}`, {
+          refetchInactive: true,
+        });
         await queryClient.invalidateQueries(
           queryKeyGenerator(data?.board?.title).single_board,
           {
@@ -124,11 +125,11 @@ const TaskList = ({ list }) => {
               className="cursor-pointer"
               onClick={() => setHideEditList(!hideEditList)}
             >
-              {list.name}
+              {list?.name}
             </p>
             <EditListName
               boardID={query.docId}
-              listID={list.id}
+              listID={list?.id}
               hide={hideEditList}
               setHideEditList={setHideEditList}
               setRename={setRename}

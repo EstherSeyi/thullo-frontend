@@ -25,20 +25,17 @@ const NewCardForm = ({ showForm, listID }) => {
     },
     {
       onSuccess: async (data) => {
+        await queryClient.invalidateQueries(`list_${data?.list?.id}`, {
+          refetchInactive: true,
+        });
         await queryClient.invalidateQueries(
-          queryKeyGenerator(data?.creator?.id).user_boards,
+          queryKeyGenerator(query.id).single_board,
           {
             refetchInactive: true,
           }
         );
         await queryClient.invalidateQueries(
-          queryKeyGenerator(data?.title).single_board,
-          {
-            refetchInactive: true,
-          }
-        );
-        await queryClient.invalidateQueries(
-          queryKeyGenerator(query.docId).board_lists,
+          queryKeyGenerator(data?.list?.board).board_lists,
           {
             refetchInactive: true,
           }
