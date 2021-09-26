@@ -1,6 +1,8 @@
 import { useState, useRef } from "react";
 import { useRouter } from "next/router";
 import { useQueryClient } from "react-query";
+import * as yup from "yup";
+import { useFormik } from "formik";
 
 // import profilepic from "../../public/profilepic.jpeg";
 import cardpic from "../../public/cardpics.jpeg";
@@ -116,6 +118,7 @@ const Board = () => {
             <NewListForm
               hideListSetting={hideListSetting}
               setHideListSetting={setHideListSetting}
+              boardId={query.docId}
             />
           </div>
         </div>
@@ -124,7 +127,61 @@ const Board = () => {
   );
 };
 
-const NewListForm = ({ setHideListSetting, hideListSetting }) => {
+const schema = yup.object({
+  name: yup.string().required("Name is required."),
+});
+
+const NewListForm = ({ setHideListSetting, hideListSetting, boardId }) => {
+  const queryClient = useQueryClient();
+  const { mutate, isLoading } = useAppMutation(
+    {
+      url: `/lists`,
+    },
+    {
+      onSuccess: async (data) => {
+        await queryClient.invalidateQueries(
+          queryKeyGenerator(data?.creator?.id).user_boards,
+          {
+            refetchInactive: true,
+            exact: true,
+          }
+        );
+        await queryClient.invalidateQueries(
+          queryKeyGenerator(boardId).user_boards,
+          {
+            refetchInactive: true,
+            exact: true,
+          }
+        );
+        await queryClient.invalidateQueries(
+          queryKeyGenerator(boardId).board_lists,
+          {
+            refetchInactive: true,
+            exact: true,
+          }
+        );
+        setHideListSetting(true);
+        formik.resetForm({
+          name: "",
+        });
+      },
+      onSettled: (_, error) => {
+        error && console.log(error);
+      },
+    }
+  );
+
+  const formik = useFormik({
+    initialValues: {
+      name: "",
+    },
+    validationSchema: schema,
+    validateOnBlur: true,
+    onSubmit: (values) => {
+      mutate({ ...values, board: [boardId] });
+    },
+  });
+
   return (
     <form
       className={`${
@@ -132,17 +189,28 @@ const NewListForm = ({ setHideListSetting, hideListSetting }) => {
           ? "hidden"
           : "bg-greyish-50 p-2 rounded absolute top-0 left-0 right-0"
       } `}
+      onSubmit={formik.handleSubmit}
     >
-      <input
-        placeholder="Enter list title..."
-        className="placeholder-greyish-150 font-noto p-1 w-full bg-transparent border-2 border-blueish-250 rounded text-sm"
-      />
+      <div className="relative">
+        <input
+          placeholder="Enter list title..."
+          className="placeholder-greyish-150 font-noto p-1 w-full bg-transparent border-2 border-blueish-250 rounded text-sm pb-4"
+          name="name"
+          value={formik.values.name}
+          onChange={formik.handleChange}
+        />
+        {formik.touched.name && formik.errors.name && (
+          <small className="text-0.625rem text-misc-red absolute right-0 left-2 bottom-0 font-noto font-light">
+            {formik.errors.name}
+          </small>
+        )}
+      </div>
       <div className="flex items-center mt-1">
         <button
           className="mr-2 text-misc-white bg-blueish-250 text-xs px-2 py-1 rounded"
           type="submit"
         >
-          Add List
+          {isLoading ? "Loading..." : " Add List"}
         </button>
         <button type="button" onClick={() => setHideListSetting(true)}>
           <Cancel className="h-5 w-5 text-greyish-200" />
