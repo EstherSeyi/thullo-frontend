@@ -13,7 +13,7 @@ const EditListName = ({ hide, setHideEditList, setRename }) => {
       ref={editListRef}
       className={`${
         hide ? "hidden" : ""
-      } absolute text-0.625rem text-greyish-100 bg-misc-white left-0 w-36 border border-greyish-250 p-2 rounded-2xl`}
+      } absolute text-0.625rem text-greyish-100 bg-misc-white left-0 w-36 border z-10 border-greyish-250 p-2 rounded-2xl`}
     >
       <li
         className="py-2 border-b border-greyish-250 cursor-pointer"
