@@ -24,7 +24,7 @@ const BoardMembers = ({ members, sm = true }) => {
     url: "/users",
   });
 
-  const { mutate, inviteLoading } = useAppMutation(
+  const { mutate, isLoading: inviteLoading } = useAppMutation(
     {
       method: "PUT",
       url: `/boards/${query.docId}`,
