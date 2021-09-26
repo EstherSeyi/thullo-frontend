@@ -8,7 +8,6 @@ import ChevronDown from "./icons/chevron-down";
 import ViewGrid from "./icons/view-grid";
 
 import logo from "../public/Logo.svg";
-import profilepic from "../public/profilepic.jpeg";
 
 import useClickOutside from "../hooks/use-click-outside";
 import { useUser } from "../hooks/auth-hook";
