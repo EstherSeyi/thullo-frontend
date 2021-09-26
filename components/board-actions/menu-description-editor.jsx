@@ -1,12 +1,20 @@
 import { useState, useRef } from "react";
 import dynamic from "next/dynamic";
 import "suneditor/dist/css/suneditor.min.css";
+import { useRouter } from "next/router";
+import { useQueryClient } from "react-query";
+
+import { useAppQuery, useAppMutation } from "../../hooks/query-hook";
+import { useUser } from "../../hooks/auth-hook";
 
 const SunEditor = dynamic(() => import("suneditor-react"), {
   ssr: false,
 });
 
-const MenuDescriptionEditor = ({ setEditDesc }) => {
+const MenuDescriptionEditor = ({ setEditDesc, description }) => {
+  const { user } = useUser();
+  const queryClient = useQueryClient();
+  const { query } = useRouter();
   const editor = useRef();
   const getSunEditorInstance = (sunEditor) => {
     editor.current = sunEditor;
@@ -23,9 +31,36 @@ const MenuDescriptionEditor = ({ setEditDesc }) => {
     }));
   };
 
+  const { mutate, isLoading } = useAppMutation(
+    {
+      method: "PUT",
+      url: `/boards/${query.docId}`,
+    },
+    {
+      onSuccess: async (data) => {
+        await queryClient.invalidateQueries(`board_${data?.title}`, {
+          refetchInactive: true,
+          exact: true,
+        });
+        await queryClient.invalidateQueries(`boards_${user?.id}`, {
+          refetchInactive: true,
+          exact: true,
+        });
+        setEditDesc(false);
+      },
+      onSettled: (_, error) => {
+        error && console.log(error);
+      },
+    }
+  );
+
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log(state);
+
+    mutate({
+      description: state.editorContent,
+    });
   };
 
   return (
@@ -34,19 +69,7 @@ const MenuDescriptionEditor = ({ setEditDesc }) => {
         name="description"
         getSunEditorInstance={getSunEditorInstance}
         onChange={handleChange}
-        defaultValue="<p>Simple board to start on a project.</p>
-
-      <p>Each list can hold items (cards) that represent ideas or tasks.</p>
-      
-      <p>There 4 lists here:</p>
-      
-      <ul>
-      <li> <strong>Backlog</strong> 🤔 : Ideas are created here. Here people can describe the idea following three simple questions: Why you wish to do it, What it is, how can you do it.</li>
-      
-      <li>   <strong>In Progress</strong>📚: Once the ideas is clearly defined, the task can move to #todo stage. Here the owner of the idea can move to #doing once s/he is ready. He can also wait a bit for other members to join.</li>
-      <li> <strong>In Review</strong> ⚙️: On-going</li>
-      <li> <strong>Completed</strong> 🙌🏽**: Finished</li>
-      </ul>"
+        defaultValue={description}
         width="100%"
         height="421px"
         autoFocus={true}
@@ -60,7 +83,7 @@ const MenuDescriptionEditor = ({ setEditDesc }) => {
           className="bg-greenish-150 text-misc-white px-2 py-1 mr-2 rounded-md"
           type="submit"
         >
-          save
+          {isLoading ? "Loading..." : "save"}
         </button>
         <button
           className="text-greyish-100 border border-greyish-100 rounded-md px-2 py-1"
