@@ -39,6 +39,7 @@ const MenuDescStyles = styled.div.attrs({
 `;
 
 const BoardMenu = ({ hide, setHideBoard }) => {
+  const [userBeingRemoved, setUserBeingRemoved] = useState();
   const { query } = useRouter();
   const { user } = useUser();
   const { appInfo } = useAppInfo();
@@ -79,6 +80,7 @@ const BoardMenu = ({ hide, setHideBoard }) => {
   );
 
   const handleRemoveUser = (userId) => {
+    setUserBeingRemoved(userId);
     mutate({
       members: data?.members.filter((member) => member.id !== userId),
     });
@@ -158,7 +160,9 @@ const BoardMenu = ({ hide, setHideBoard }) => {
               alt={`${member?.username ?? "user"}'s avatar`}
               handleRemoveUser={handleRemoveUser}
               userId={member?.id}
-              removeLoading={isLoading}
+              removeLoading={
+                userBeingRemoved === member?.id ? isLoading : false
+              }
             />
           ))}
         </div>
