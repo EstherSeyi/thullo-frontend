@@ -122,7 +122,6 @@ const NewListForm = ({ setHideListSetting, hideListSetting, boardId }) => {
     },
     {
       onSuccess: async (data) => {
-        console.log(data);
         await queryClient.invalidateQueries(
           queryKeyGenerator(data?.board?.title).single_board,
           {
@@ -154,7 +153,7 @@ const NewListForm = ({ setHideListSetting, hideListSetting, boardId }) => {
     validationSchema: schema,
     validateOnBlur: true,
     onSubmit: (values) => {
-      mutate({ ...values, board: [boardId] });
+      mutate({ ...values, board: [parseFloat(boardId)] });
     },
   });
 

@@ -58,7 +58,11 @@ const NewCardForm = ({ showForm, listID }) => {
     validationSchema: schema,
     validateOnBlur: true,
     onSubmit: (values) => {
-      mutate({ ...values, creator: [user?.id], list: [listID] });
+      mutate({
+        ...values,
+        creator: [user?.id],
+        list: [parseFloat(listID ?? "0")],
+      });
     },
   });
 
