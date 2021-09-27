@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/router";
 import { useQueryClient } from "react-query";
 import * as yup from "yup";
@@ -21,12 +21,22 @@ import BoardMembers from "../../components/board-actions/board-members";
 
 import Cancel from "../../components/icons/cancel";
 
+import { useAppInfo } from "../../hooks/use-app-info";
+
 const Board = () => {
   const { query } = useRouter();
   const { user } = useUser();
 
+  const { appInfo, setAppInfo } = useAppInfo();
+
+  useEffect(() => {
+    if (!appInfo?.currBoard && query.docId) {
+      setAppInfo("currBoard", query.docId);
+    }
+  }, []);
+
   const { data } = useAppQuery(queryKeyGenerator(query.id).single_board, {
-    url: `/boards/${query.docId}`,
+    url: `/boards/${appInfo?.currBoard}`,
   });
 
   const [hideVisibility, setHideVisibility] = useState(true);
@@ -55,7 +65,7 @@ const Board = () => {
             )}
 
             <VisibilityOptions
-              docId={query.docId}
+              docId={appInfo?.currBoard}
               hide={hideVisibility}
               setHideVisibility={setHideVisibility}
               isCreator={data?.creator.username === user?.username}
@@ -96,7 +106,7 @@ const Board = () => {
             <NewListForm
               hideListSetting={hideListSetting}
               setHideListSetting={setHideListSetting}
-              boardId={query.docId}
+              boardId={appInfo?.currBoard}
             />
           </div>
         </div>

@@ -9,6 +9,8 @@ import MemberAvatar from "../components/member-avatar";
 import coverpic from "../public/cardpics.jpeg";
 import request from "../helpers/request";
 import { Fragment } from "react";
+import { useRouter } from "next/router";
+import { useAppInfo } from "../hooks/use-app-info";
 
 const BoardTemplate = ({ count, dataQueryKey = "", queryUrl, text = "" }) => {
   const {
@@ -107,6 +109,8 @@ const BoardTemplate = ({ count, dataQueryKey = "", queryUrl, text = "" }) => {
 };
 
 const Card = ({ title, members, cover_image, id }) => {
+  const { setAppInfo } = useAppInfo();
+  const router = useRouter();
   return (
     <div className="bg-misc-white p-3 rounded-md shadow-lg w-full xs:w-11/12 sm:w-full mx-auto sm:max-w-[250px]">
       <div className="rounded-md w-full">
@@ -120,9 +124,15 @@ const Card = ({ title, members, cover_image, id }) => {
           layout="responsive"
         />
       </div>
-      <Link href={`/boards/${title}?docId=${id}`}>
+      <button
+        type="button"
+        onClick={() => {
+          setAppInfo("currBoard", id);
+          router.push(`/boards/${title}?docId=${id}`);
+        }}
+      >
         <p className="block mt-4 mb-4 truncate cursor-pointer">{title}</p>
-      </Link>
+      </button>
       <div className="flex">
         <div className="flex">
           {members?.length &&

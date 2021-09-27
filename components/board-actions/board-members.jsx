@@ -1,6 +1,5 @@
 import { useState, useRef } from "react";
 import Image from "next/image";
-import { useRouter } from "next/router";
 import { useQueryClient } from "react-query";
 
 import MemberAvatar from "../member-avatar";
@@ -11,12 +10,13 @@ import useClickOutside from "../../hooks/use-click-outside";
 import { useAppQuery, useAppMutation } from "../../hooks/query-hook";
 import { useUser } from "../../hooks/auth-hook";
 import { queryKeyGenerator } from "../../helpers/query-key-generator";
+import { useAppInfo } from "../../hooks/use-app-info";
 
 const BoardMembers = ({ members, sm = true }) => {
   const { user } = useUser();
+  const { appInfo } = useAppInfo();
   const [userIds, setUserIds] = useState([]);
   const queryClient = useQueryClient();
-  const { query } = useRouter();
 
   const inviteMemberRef = useRef(null);
   const [invite, setInvite] = useState(false);
@@ -29,7 +29,7 @@ const BoardMembers = ({ members, sm = true }) => {
   const { mutate, isLoading: inviteLoading } = useAppMutation(
     {
       method: "PUT",
-      url: `/boards/${query.docId}`,
+      url: `/boards/${appInfo?.currBoard}`,
     },
     {
       onSuccess: async (data) => {

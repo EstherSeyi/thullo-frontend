@@ -7,6 +7,7 @@ import { useQueryClient } from "react-query";
 import { useAppMutation } from "../../hooks/query-hook";
 import { useUser } from "../../hooks/auth-hook";
 import { queryKeyGenerator } from "../../helpers/query-key-generator";
+import { useAppInfo } from "../../hooks/use-app-info";
 
 const SunEditor = dynamic(() => import("suneditor-react"), {
   ssr: false,
@@ -14,8 +15,8 @@ const SunEditor = dynamic(() => import("suneditor-react"), {
 
 const MenuDescriptionEditor = ({ setEditDesc, description }) => {
   const { user } = useUser();
+  const { appInfo } = useAppInfo();
   const queryClient = useQueryClient();
-  const { query } = useRouter();
   const editor = useRef();
   const getSunEditorInstance = (sunEditor) => {
     editor.current = sunEditor;
@@ -35,12 +36,12 @@ const MenuDescriptionEditor = ({ setEditDesc, description }) => {
   const { mutate, isLoading } = useAppMutation(
     {
       method: "PUT",
-      url: `/boards/${query.docId}`,
+      url: `/boards/${appInfo?.currBoard}`,
     },
     {
       onSuccess: async (data) => {
         await queryClient.invalidateQueries(
-          queryKeyGenerator(data?.id).single_board,
+          queryKeyGenerator(data?.title).single_board,
           {
             refetchInactive: true,
           }

@@ -16,6 +16,7 @@ import EditListName from "./edit-list-name";
 import useClickOutside from "../../hooks/use-click-outside";
 import { useAppMutation, useAppQuery } from "../../hooks/query-hook";
 import { queryKeyGenerator } from "../../helpers/query-key-generator";
+import { useAppInfo } from "../../hooks/use-app-info";
 
 const schema = object({
   name: string().required("Name is required."),
@@ -23,6 +24,7 @@ const schema = object({
 
 const TaskList = ({ listID }) => {
   const { query } = useRouter();
+  const { appInfo } = useAppInfo();
   const queryClient = useQueryClient();
   const [hideEditList, setHideEditList] = useState(true);
   const [showCardSettings, setShowCardSettings] = useState(false);
@@ -128,7 +130,7 @@ const TaskList = ({ listID }) => {
               {list?.name}
             </p>
             <EditListName
-              boardID={query.docId}
+              boardID={appInfo?.currBoard}
               listID={list?.id}
               hide={hideEditList}
               setHideEditList={setHideEditList}

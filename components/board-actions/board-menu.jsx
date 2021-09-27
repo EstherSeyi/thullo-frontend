@@ -19,6 +19,7 @@ import { useAppQuery, useAppMutation } from "../../hooks/query-hook";
 import { formatDate } from "../../helpers/format-date";
 import { useUser } from "../../hooks/auth-hook";
 import { queryKeyGenerator } from "../../helpers/query-key-generator";
+import { useAppInfo } from "../../hooks/use-app-info";
 
 const MenuDescStyles = styled.div.attrs({
   className: "text-justify text-sm text-misc-black2 w-11/12 mb-6 font-light",
@@ -40,6 +41,7 @@ const MenuDescStyles = styled.div.attrs({
 const BoardMenu = ({ hide, setHideBoard }) => {
   const { query } = useRouter();
   const { user } = useUser();
+  const { appInfo } = useAppInfo();
   const [editDesc, setEditDesc] = useState(false);
   const menuRef = useRef(null);
   const queryClient = useQueryClient();
@@ -47,13 +49,13 @@ const BoardMenu = ({ hide, setHideBoard }) => {
   useClickOutside(menuRef, () => !hide && setHideBoard(true));
 
   const { data } = useAppQuery(queryKeyGenerator(query.id).single_board, {
-    url: `/boards/${query.docId}`,
+    url: `/boards/${appInfo?.currBoard}`,
   });
 
   const { mutate, isLoading } = useAppMutation(
     {
       method: "PUT",
-      url: `/boards/${query.docId}`,
+      url: `/boards/${appInfo?.currBoard}`,
     },
     {
       onSuccess: async (data) => {
@@ -84,7 +86,7 @@ const BoardMenu = ({ hide, setHideBoard }) => {
 
   return (
     <div
-      className={`absolute top-8 right-0 p-4 left-0 sm:left-1/4 md:left-1/3 lg:left-2/4 bg-misc-white bottom-0 z-10 ${
+      className={`absolute min-h-screen top-8 right-0 p-4 left-0 sm:left-1/4 md:left-1/3 lg:left-2/4 bg-misc-white bottom-0 z-10 ${
         hide ? "hidden" : ""
       }`}
       ref={menuRef}
