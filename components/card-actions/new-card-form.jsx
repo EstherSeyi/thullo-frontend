@@ -61,7 +61,7 @@ const NewCardForm = ({ showForm, listID }) => {
       mutate({
         ...values,
         creator: [user?.id],
-        list: [parseFloat(listID ?? "0")],
+        list: parseFloat(listID ?? "0"),
       });
     },
   });

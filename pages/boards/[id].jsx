@@ -153,7 +153,7 @@ const NewListForm = ({ setHideListSetting, hideListSetting, boardId }) => {
     validationSchema: schema,
     validateOnBlur: true,
     onSubmit: (values) => {
-      mutate({ ...values, board: [parseFloat(boardId)] });
+      mutate({ ...values, board: parseFloat(boardId) });
     },
   });
 
