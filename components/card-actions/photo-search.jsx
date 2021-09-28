@@ -1,11 +1,12 @@
 import { useState, Fragment } from "react";
 import Image from "next/image";
-import { useInfiniteQuery } from "react-query";
+import { useInfiniteQuery, useQueryClient } from "react-query";
 import InfiniteScroll from "react-infinite-scroll-component";
 import axios from "axios";
 import queryString from "query-string";
 
 import Search from "../icons/search";
+import { useAppMutation } from "../../hooks/query-hook";
 
 export const useUnspalshInfinite = (
   queryKey,
@@ -39,9 +40,16 @@ export const useUnspalshInfinite = (
   return data;
 };
 
-const PhotoSearch = ({ openCover, coverRef }) => {
+const PhotoSearch = ({ openCover, coverRef, cardID }) => {
+  const queryClient = useQueryClient();
   const [value, setValue] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [currSelectedPhoto, setCurrSelectedPhoto] = useState({
+    id: "",
+    src: "",
+    alt: "",
+    artist: "",
+  });
 
   const { data, hasNextPage, fetchNextPage, isFetchingNextPage } =
     useUnspalshInfinite("unsplash_images", {
@@ -63,13 +71,46 @@ const PhotoSearch = ({ openCover, coverRef }) => {
     searchQuery
   );
 
+  const { mutate, isLoading } = useAppMutation(
+    {
+      url: "/photos",
+    },
+    {
+      onSuccess: async () => {
+        await queryClient.invalidateQueries(`card_${cardID}`, {
+          refetchInactive: true,
+        });
+        await queryClient.invalidateQueries(`cover-photo_${cardID}`, {
+          refetchInactive: true,
+        });
+      },
+      onSettled: (_, error) => {
+        error && console.log(error);
+      },
+    }
+  );
+
   const handleSelectcover = (selected) => {
-    console.log(selected);
+    setCurrSelectedPhoto({
+      id: selected?.id,
+      alt: selected?.alt,
+      src: selected?.urls?.regular,
+      artist: selected?.user?.links?.self,
+    });
   };
 
   const handleSearch = (event) => {
     event.preventDefault();
     setSearchQuery(value);
+  };
+
+  const handleSaveCoverPhoto = () => {
+    mutate({
+      src: currSelectedPhoto.src,
+      alt: currSelectedPhoto.alt,
+      artist: currSelectedPhoto.artist,
+      card: cardID,
+    });
   };
 
   return (
@@ -131,17 +172,30 @@ const PhotoSearch = ({ openCover, coverRef }) => {
                 <Fragment key={`pages-${index}`}>
                   {page?.data?.results?.map(
                     ({ alt_description, urls, id, user }) => (
-                      <Image
-                        onClick={() =>
-                          handleSelectcover({ alt_description, urls, id, user })
-                        }
+                      <div
+                        className={`${
+                          currSelectedPhoto.id === id
+                            ? "border-2 rounded border-blueish-250"
+                            : ""
+                        }`}
                         key={id}
-                        className="rounded"
-                        src={urls?.thumb}
-                        alt={alt_description}
-                        width={64}
-                        height={64}
-                      />
+                      >
+                        <Image
+                          onClick={() =>
+                            handleSelectcover({
+                              alt_description,
+                              urls,
+                              id,
+                              user,
+                            })
+                          }
+                          className="rounded"
+                          src={urls?.thumb}
+                          alt={alt_description}
+                          width={64}
+                          height={64}
+                        />
+                      </div>
                     )
                   )}
                 </Fragment>
@@ -177,17 +231,30 @@ const PhotoSearch = ({ openCover, coverRef }) => {
               {data?.pages?.map((page, index) => (
                 <Fragment key={`pages-${index}`}>
                   {page?.data?.map(({ alt_description, urls, id, user }) => (
-                    <Image
-                      onClick={() =>
-                        handleSelectcover({ alt_description, urls, id, user })
-                      }
+                    <div
+                      className={`${
+                        currSelectedPhoto.id === id
+                          ? "border-2 rounded border-blueish-250"
+                          : ""
+                      }`}
                       key={id}
-                      className="rounded"
-                      src={urls?.thumb}
-                      alt={alt_description}
-                      width={64}
-                      height={64}
-                    />
+                    >
+                      <Image
+                        onClick={() =>
+                          handleSelectcover({
+                            alt_description,
+                            urls,
+                            id,
+                            user,
+                          })
+                        }
+                        className="rounded"
+                        src={urls?.thumb}
+                        alt={alt_description}
+                        width={64}
+                        height={64}
+                      />
+                    </div>
                   ))}
                 </Fragment>
               ))}
@@ -195,6 +262,14 @@ const PhotoSearch = ({ openCover, coverRef }) => {
           </InfiniteScroll>
         ) : null}
       </div>
+
+      <button
+        type="button"
+        className="bg-blueish-250 text-misc-white mt-2 py-1 rounded"
+        onClick={handleSaveCoverPhoto}
+      >
+        {isLoading ? "Loading..." : "Select"}
+      </button>
     </div>
   );
 };

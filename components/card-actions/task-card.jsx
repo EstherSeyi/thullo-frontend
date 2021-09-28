@@ -8,21 +8,26 @@ import Tag from "../tag";
 import EditCard from "../card-actions/index";
 
 import { useModal } from "../../context/modal";
+import { useAppQuery } from "../../hooks/query-hook";
 
 const TaskCard = ({ card }) => {
   const { open } = useModal();
+
+  const { data: photo } = useAppQuery(`cover-photo_${card?.id}`, {
+    url: `/photos/${card.photo}`,
+  });
   return (
     <div className="font-noto p-2 bg-misc-white rounded-lg shadow-md mb-4 w-[272px]">
-      {card?.imageSrc ? (
-        <Image
-          src={card.imageSrc}
-          className="rounded"
-          width={450}
-          height={250}
-          objectFit="fill"
-          layout="responsive"
-          alt="interior of a lounge"
-        />
+      {photo?.src ? (
+        <div className="w-full h-[150px] relative mb-4">
+          <Image
+            src={photo?.src}
+            className="rounded"
+            layout="fill"
+            objectFit="cover"
+            alt={photo?.alt ?? "card cover photo"}
+          />
+        </div>
       ) : null}
 
       <p className="mb-3">{card.title}</p>

@@ -52,15 +52,16 @@ const EditCard = ({ cardID }) => {
       >
         <Cancel className="h-5 w-5 text-misc-white" />
       </button>
-      <Image
-        src={cardpic}
-        className="rounded-lg mb-4"
-        width={450}
-        height={100}
-        objectFit="fill"
-        layout="responsive"
-        alt="interior of a lounge"
-      />
+      <div className="w-full h-[150px] relative mb-4">
+        <Image
+          src={card?.photo?.src ?? cardpic}
+          className="rounded-lg  absolute"
+          layout="fill"
+          objectFit="cover"
+          alt={card?.photo?.alt ?? "card cover photo"}
+          sizes="250px"
+        />
+      </div>
       <div className="flex mt-4 flex-col sm:flex-row justify-between">
         <div className="flex-70 mr-4">
           <p>{card?.title}</p>
